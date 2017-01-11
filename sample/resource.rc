@@ -1,0 +1,159 @@
+#include <windows.h>
+
+#ifdef __GNUC__
+    // We must be using windres which uses gcc as its preprocessor. We do need
+    // to generate the manifest then as gcc doesn't do it automatically and we
+    // can define the architecture macro on our own as all the usual symbols
+    // are available (unlike with Microsoft RC.EXE which doesn't predefine
+    // anything useful at all).
+    #ifndef wxUSE_RC_MANIFEST
+        #define wxUSE_RC_MANIFEST 1
+    #endif
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Specify the processor architecture (wxWidgets seems not to do this correctly)
+#if defined __i386__
+    #ifndef WX_CPU_X86
+        #define WX_CPU_X86
+    #endif
+#elif defined __x86_64__
+    #ifndef WX_CPU_AMD64
+        #define WX_CPU_AMD64
+    #endif
+#elif defined __ia64__
+    #ifndef WX_CPU_IA64
+        #define WX_CPU_IA64
+    #endif
+#endif
+
+#if defined(_M_AMD64)
+  #if  defined(WX_CPU_X86)
+    #undef WX_CPU_X86
+  #endif
+  #if !defined(WX_CPU_AMD64)
+    #define WX_CPU_AMD64
+  #endif
+#elif defined(_M_IA64)
+  #if  defined(WX_CPU_X86)
+    #undef WX_CPU_X86
+  #endif
+  #if !defined(WX_CPU_IA64)
+    #define WX_CPU_IA64
+  #endif
+#elif defined(_M_IX86) || defined(_X86_) || defined(__i386__)
+  #if !defined(WX_CPU_X86)
+    #define WX_CPU_X86
+  #endif
+#endif
+
+#ifdef _WIN64
+    #ifndef WX_CPU_AMD64
+        #define WX_CPU_AMD64
+    #endif
+#endif
+
+aaaa ICON "wx/msw/std.ico"
+
+//#include "wx/msw/wx.rc"
+
+///////////////////////////////////////////////////////////////////////////////
+// Version information
+VS_VERSION_INFO    VERSIONINFO
+  FILEVERSION      1,0,0,0
+  PRODUCTVERSION   1,0,0,1
+  FILEFLAGSMASK    0x3fL // VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+  // Can be a combination of the following OR'ed flags:
+  //   VS_FF_DEBUG,        VS_FF_PATCHED,      VS_FF_PRERELEASE,
+  //   VS_FF_PRIVATEBUILD, VS_FF_SPECIALBUILD, VS_FFI_FILEFLAGSMASK
+  FILEFLAGS        0x1L  // VS_FF_DEBUG|VS_FF_PRIVATEBUILD|VS_FF_PRERELEASE
+#else
+  FILEFLAGS        0x0L  // final version
+#endif
+  // Can be one of the following values:
+  //   VOS_UNKNOWN,       VOS_DOS,        VOS_NT,
+  //   VOS__WINDOWS16,    VOS__WINDOWS32, VOS_DOS_WINDOWS16,
+  //   VOS_DOS_WINDOWS32, VOS_NT_WINDOWS32
+  FILEOS           VOS_NT_WINDOWS32
+  // Can be one of the following values:
+  //   VFT_UNKNOWN, VFT_APP, VFT_DLL, VFT_DRV, VFT_FONT, VFT_VXD, VFT_STATIC_LIB
+  FILETYPE         VFT_APP
+  // In case of VFT_DRV in FILETYPE:
+  //   VFT2_UNKNOWN,         VFT2_DRV_COMM,     VFT2_DRV_PRINTER,
+  //   VFT2_DRV_KEYBOARD,    VFT2_DRV_LANGUAGE, VFT2_DRV_DISPLAY,
+  //   VFT2_DRV_MOUSE,       VFT2_DRV_NETWORK,  VFT2_DRV_SYSTEM,
+  //   VFT2_DRV_INSTALLABLE, VFT2_DRV_SOUND,    VFT2_DRV_VERSIONED_PRINTER
+  // In case of VFT_FONT in FILETYPE:
+  //   VFT2_UNKNOWN, VFT2_FONT_RASTER, VFT2_FONT_VECTOR, VFT2_FONT_TRUETYPE
+  FILESUBTYPE      VFT2_UNKNOWN // not used
+{
+  BLOCK "StringFileInfo"
+  {
+    BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
+    {
+      VALUE "Build",            "November 2013\0"
+      VALUE "Comments",         "LATelec GmbH exclusive property\0"
+      VALUE "CompanyName",      "LATelec GmbH\0"
+      VALUE "Developer",        "Sebastien DUBREUIL\0"
+      VALUE "FileDescription",  "Tool for creating electrical harness installation drawings\0"
+      VALUE "FileVersion",      "01.0.0.0\0"
+      VALUE "InternalName",     "Tool2In3D\0"
+      VALUE "LegalCopyright",   "Copyright (C) LATelec GmbH\0"
+      VALUE "LegalTrademarks",  "All rights reserved.\0"
+      VALUE "OriginalFilename", "Tool2In3D.exe\0"
+      VALUE "PrivateBuild",     "\0"
+      VALUE "ProductName",      "Tool2In3D\0"
+      VALUE "ProductVersion",   "12.11.0.0\0"
+      VALUE "SpecialBuild",     "\0"
+      VALUE "Support",          "\0"
+      VALUE "Users",            "Unlimited.\0"
+    } // BLOCK "040904E4"
+  } // BLOCK "StringFileInfo"
+  BLOCK "VarFileInfo"
+  {
+    VALUE "Translation", 0x409, 1252 // 1252 = 0x04E4
+  } // BLOCK "VarFileInfo"
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// Include manifest file for common controls library v6 required to use themes.
+//
+// Predefining wxUSE_NO_MANIFEST as 1 always disables the use of the manifest.
+// Otherwise we include it only if wxUSE_RC_MANIFEST is defined as 1.
+//
+
+#if !defined(wxUSE_NO_MANIFEST) || (wxUSE_NO_MANIFEST == 0)
+    #if defined(wxUSE_RC_MANIFEST) && wxUSE_RC_MANIFEST
+
+        // see "about isolated applications" topic in MSDN
+        #ifdef ISOLATION_AWARE_ENABLED
+            #define wxMANIFEST_ID ISOLATIONAWARE_MANIFEST_RESOURCE_ID
+        #else
+            #define wxMANIFEST_ID CREATEPROCESS_MANIFEST_RESOURCE_ID
+        #endif
+
+        #if defined(WX_CPU_AMD64)
+            wxMANIFEST_ID 24 "amd64.manifest"
+//            #warning Manifest: amd64.manifest
+        #elif defined(WX_CPU_IA64)
+            wxMANIFEST_ID 24 "ia64.manifest"
+//            #warning Manifest: ia64.manifest
+        #elif defined(WX_CPU_X86)
+            wxMANIFEST_ID 24 "x86.manifest"
+//            #warning Manifest: x86.manifest
+        #else
+            // Notice that if the manifest is included, WX_CPU_XXX constant corresponding
+            // to the architecture we're compiling for must be defined. This can be done
+            // either manually in your make/project file or by configuring the resource
+            // compiler paths to search in $(WXWIN)/lib/$(COMPILER_PREFIX)_lib/mswu[d]
+            // directory for its include files, as wx/msw/rcdefs.h file in this directory
+            // is generated during wxWidgets build and contains the correct definition.
+            #error "One of WX_CPU_XXX constants must be defined. See comment above."
+        #endif
+
+    #endif // wxUSE_RC_MANIFEST
+
+#endif // !defined(wxUSE_NO_MANIFEST) || (wxUSE_NO_MANIFEST == 0)
