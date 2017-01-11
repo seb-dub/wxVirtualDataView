@@ -28,11 +28,9 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-O3" />
-					<Add option="-pg" />
 					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
-					<Add option="-pg -lgmon" />
 					<Add option="--static" />
 				</Linker>
 			</Target>
