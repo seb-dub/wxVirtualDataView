@@ -267,7 +267,7 @@ wxWindow* MyFrame::CreateTreeView(wxWindow *pParent, bool bIsEmpty)
 
     //show filters - after adding columns
     //because otherwise they have a height of 0: there are no editors defined !
-    pTree->GetColumnHeaderWindow()->ShowFilters();
+    pTree->ShowFilters();
 
     //set model
     TestTreeDataModel *pModel = new TestTreeDataModel(bIsEmpty);
@@ -289,7 +289,7 @@ wxWindow* MyFrame::CreateListView(wxWindow *pParent)
 
     //show filters - after adding columns
     //because otherwise they have a height of 0: there are no editors defined !
-    pList->GetColumnHeaderWindow()->ShowFilters();
+    pList->ShowFilters();
 
     //set model
     TestListDataModel *pModel = new TestListDataModel();

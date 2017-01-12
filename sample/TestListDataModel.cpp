@@ -4,7 +4,7 @@
 #include <wx/VirtualDataView/Types/BitmapText.h>
 #include <wx/artprov.h>
 
-#define ITEMS_COUNT     100000
+#define ITEMS_COUNT     50000
 
 //-------------------- NESTED CLASS TID -----------------------------//
 TestListDataModel::TID::TID(size_t id, size_t uiField)
@@ -54,7 +54,7 @@ size_t TestListDataModel::GetItemCount(void)
   * \param eType [input] : the kind of data to get
   * \return the data of the item. Return invalid variant if no data is associated
   */
-wxVariant TestListDataModel::GetItemData(size_t uiItemID,  size_t uiField, EDataType eType)
+wxVariant TestListDataModel::GetListItemData(size_t uiItemID,  size_t uiField, EDataType eType)
 {
     //tooltip
     if (eType == WX_ITEM_TOOLTIP_DATA)
@@ -142,7 +142,7 @@ wxVariant TestListDataModel::GetItemData(size_t uiItemID,  size_t uiField, EData
   * \return a pointer to the graphic attributes for this item. The data is owned by the model.
   *         returning a NULL Pointer is valid: the default attributes will be used
   */
-wxVirtualDataViewItemAttr* TestListDataModel::GetItemAttribute(size_t uiItemID, size_t uiField,
+wxVirtualDataViewItemAttr* TestListDataModel::GetListItemAttribute(size_t uiItemID, size_t uiField,
                                                                const wxVirtualDataViewItemState &rState)
 {
     if (uiItemID % 2 == 0) return(&m_attrEven);
@@ -156,7 +156,7 @@ wxVirtualDataViewItemAttr* TestListDataModel::GetItemAttribute(size_t uiItemID, 
   * \param eType   [input]: the kind of value to modify
   * \return true if the data was modified, false otherwise
   */
-bool TestListDataModel::SetItemData(size_t uiItemID, size_t uiField,
+bool TestListDataModel::SetListItemData(size_t uiItemID, size_t uiField,
                                     const wxVariant &vValue,
                                     EDataType eType)
 {

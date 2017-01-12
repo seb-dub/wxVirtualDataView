@@ -1,5 +1,3 @@
-# wxVirtualDataView
-a data view control for wxWidgets, optimised for using as little memory as possible.
 
 Main documentation:
     see doc
@@ -14,9 +12,6 @@ Building:
     guarded using #if ... #endif, and will not break anything if not present
 
 BUGS:
-    1 : filtering UI, ComboBox:
-        Select "1" in the combo popup -> "1" appear in the text entry (OK)
-        Now re-open the popup : all the entries containing "1" are shown ("1", "10", "11", "12", ...)
 
 TODO List:
 

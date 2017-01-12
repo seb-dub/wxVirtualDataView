@@ -397,6 +397,16 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl : public wxSystemThemedControl<wxCon
         void                        ClearAllFilters(void);                      ///< \brief clear all the filters
         void                        ApplyFilters(void);                         ///< \brief apply the current filters
 
+        bool AreFiltersShown(void) const;                                       ///< \brief return true if filters are shown
+        bool AreFiltersHidden(void) const;                                      ///< \brief return true if filters are hidden
+        void ShowFilters(bool bShow = true);                                    ///< \brief show / hide filters
+        void HideFilters(bool bHide = true);                                    ///< \brief hide / show filters
+        void ToggleFilters(void);                                               ///< \brief show filters ON/OFF
+        virtual bool StartFilter(size_t uiCol);                                 ///< \brief start edition of a filter
+        virtual bool EndFilter(void);                                           ///< \brief finish edition of a filter
+        bool IsFiltering(size_t uiCol);                                         ///< \brief check if the filter is active and not empty
+        bool IsFiltering(void);                                                 ///< \brief check if at least one filter is active and not empty
+
         //column resizing
         bool StartResizingColumn(size_t uiCol, int iNewWidth);                  ///< \brief start resizing a column
         bool ResizingColumn(size_t uiCol, int iNewWidth);                       ///< \brief currently resizing a column

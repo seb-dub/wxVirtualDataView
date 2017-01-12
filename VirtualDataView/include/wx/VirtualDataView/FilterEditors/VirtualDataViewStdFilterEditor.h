@@ -36,6 +36,7 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewStdFilterEditor : public wxVirtualDataVie
         virtual void      InitFilter(wxVirtualIDataModel *pSrcModel,
                                      size_t uiField,
                                      wxVirtualIStateModel *pStateModel);            ///< \brief initialize the filter
+        virtual bool      IsFiltering(void);                                        ///< \brief check if the filter is currently filtering something
 
     protected:
         //data

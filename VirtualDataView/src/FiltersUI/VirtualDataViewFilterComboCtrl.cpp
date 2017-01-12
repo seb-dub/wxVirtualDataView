@@ -144,10 +144,19 @@ void wxVirtualDataViewFilterComboCtrl::OnButtonClick(void)
         oEvent.SetEventObject(this);
         HandleWindowEvent(oEvent);
 
+        if (m_pFilterDialog)
+        {
+            if (m_pFilterDialog->IsShown())
+            {
+                m_pFilterDialog->Hide();
+                return;
+            }
+        }
+
         if (!m_pFilterDialog) m_pFilterDialog = new wxVirtualDataViewFilterPopup(this);
         int w, h, x, y;
         GetSize(&w, &h);
-        x = 0; y += h;
+        x = 0; y = h;
         ClientToScreen(&x, &y);
 
         int x0, y0;
@@ -161,9 +170,16 @@ void wxVirtualDataViewFilterComboCtrl::OnButtonClick(void)
         iScreenHeight -= y0;
 
         //get best popup size
+        m_pFilterDialog->InvalidateBestSize();
         wxSize sBestSize = m_pFilterDialog->GetBestSize();
         int iBestWidth = sBestSize.GetWidth();
         int iBestHeight = sBestSize.GetHeight();
+
+        //if current size is bigger than best size, keep it
+        m_pFilterDialog->GetSize(&w, &h);
+        if (w > iBestWidth) iBestWidth = w;
+        if (h > iBestHeight) iBestHeight = h;
+
 
         //limits allowed
         int iMinWidth  = m_widthMinPopup;
@@ -188,7 +204,7 @@ void wxVirtualDataViewFilterComboCtrl::OnButtonClick(void)
         wxVirtualDataViewFilterPanel *pPanel = GetFilterPanel();
         if (pPanel)
         {
-            //pPanel->ApplySearchString(GetValue(), !m_bGeneratedByTextEntry);
+            pPanel->ApplySearchString(GetValue(), !m_bGeneratedByTextEntry);
         }
 
         //show

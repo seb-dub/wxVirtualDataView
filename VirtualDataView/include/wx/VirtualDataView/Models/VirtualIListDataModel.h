@@ -37,14 +37,14 @@ class WXDLLIMPEXP_VDV wxVirtualIListDataModel : public wxVirtualIDataModel
         virtual size_t GetItemCount(void) = 0;                                              ///< \brief get amount of items
 
         //new interface : item data
-        virtual wxVariant GetItemData(size_t uiItemID,
+        virtual wxVariant GetListItemData(size_t uiItemID,
                                       size_t uiField = 0,
                                       EDataType eType = WX_ITEM_MAIN_DATA);                 ///< \brief get the item data
-        virtual wxVirtualDataViewItemAttr* GetItemAttribute(size_t uiItemID,
+        virtual wxVirtualDataViewItemAttr* GetListItemAttribute(size_t uiItemID,
                                                             size_t uiField,
                                               const wxVirtualDataViewItemState &rState);    ///< \brief get the item graphic attributes
-        virtual EFlags    GetItemFlags(size_t uiItemID, size_t uiField);                    ///< \brief get the item flags
-        virtual bool      SetItemData(size_t uiItemID, size_t uiField,
+        virtual EFlags    GetListItemFlags(size_t uiItemID, size_t uiField);                ///< \brief get the item flags
+        virtual bool      SetListItemData(size_t uiItemID, size_t uiField,
                                       const wxVariant &vValue,
                                       EDataType eType = WX_ITEM_MAIN_DATA);                 ///< \brief set the item data
 

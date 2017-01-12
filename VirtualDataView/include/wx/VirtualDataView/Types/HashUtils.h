@@ -13,7 +13,7 @@
 #include <wx/VirtualDataView/VirtualDataViewDefs.h>
 
 //----------------- FLOAT / DOUBLE HASHING --------------------------//
-unsigned long wxGetFloatBits(float x)
+inline unsigned long wxGetFloatBits(float x)
 {
     union u
     {
@@ -31,7 +31,7 @@ unsigned long wxGetFloatBits(float x)
     return(ul);
 };
 
-unsigned long wxGetDoubleBits(double x)
+inline unsigned long wxGetDoubleBits(double x)
 {
     union u
     {

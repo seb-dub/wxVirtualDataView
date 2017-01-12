@@ -7,12 +7,16 @@
 
 #include <wx/VirtualDataView/Models/VirtualFilteringDataModel.h>
 #include <wx/VirtualDataView/Filters/VirtualDataViewFilter.h>
+#include <wx/VirtualDataView/Types/VariantUtils.h>
+#include <wx/VirtualDataView/Types/HashUtils.h>
+#include <wx/hashset.h>
 
 //--------------- CONSTRUCTORS & DESTRUCTOR -------------------------//
 /** Default constructor
   */
 wxVirtualFilteringDataModel::wxVirtualFilteringDataModel(void)
-    : wxVirtualIArrayProxyDataModel()
+    : wxVirtualIArrayProxyDataModel(),
+      m_bApplyFiltersForGetAllValues(true)
 {
 }
 
@@ -97,7 +101,7 @@ bool wxVirtualFilteringDataModel::IsFiltering(size_t uiField) const
         const TFilter &t = *it;
         if ((t.m_uiField == uiField) && (t.m_pFilter))
         {
-            return(true);
+            if (t.m_pFilter->IsActive()) return(true);
         }
         ++it;
     }
@@ -114,7 +118,10 @@ bool wxVirtualFilteringDataModel::IsFiltering(void) const
     while (it != itEnd)
     {
         const TFilter &t = *it;
-        if (t.m_pFilter) return(true);
+        if (t.m_pFilter)
+        {
+            if (t.m_pFilter->IsActive()) return(true);
+        }
         ++it;
     }
     return(false);
@@ -181,7 +188,7 @@ bool wxVirtualFilteringDataModel::IsAccepted(const wxVirtualItemID &rID)
         {
             if (rFilter.m_pFilter->IsActive())
             {
-                wxVariant vValue = GetItemData(rID, rFilter.m_uiField, WX_ITEM_MAIN_DATA);
+                wxVariant vValue = m_pDataModel->GetItemData(rID, rFilter.m_uiField, WX_ITEM_MAIN_DATA);
                 if (!rFilter.m_pFilter->AcceptValue(vValue))
                 {
                     bool bRecursive = rFilter.m_pFilter->IsRecursive();
@@ -199,6 +206,31 @@ bool wxVirtualFilteringDataModel::IsAccepted(const wxVirtualItemID &rID)
                     }
                     return(false);
                 }
+            }
+        }
+
+        ++it;
+    }
+    return(true);
+}
+
+/** Check if an item is accepted, ignoring filter recursivity
+  * \param rID [input]: the item to check
+  * \return true if the item is accepted, false otherwise
+  */
+bool wxVirtualFilteringDataModel::IsAcceptedNonRecursive(const wxVirtualItemID &rID)
+{
+    TFilters::const_iterator it     = m_vFilters.begin();
+    TFilters::const_iterator itEnd  = m_vFilters.end();
+    while (it != itEnd)
+    {
+        const TFilter &rFilter = *it;
+        if (rFilter.m_pFilter)
+        {
+            if (rFilter.m_pFilter->IsActive())
+            {
+                wxVariant vValue = m_pDataModel->GetItemData(rID, rFilter.m_uiField, WX_ITEM_MAIN_DATA);
+                if (!rFilter.m_pFilter->AcceptValue(vValue)) return(false);
             }
         }
 
@@ -230,4 +262,409 @@ void wxVirtualFilteringDataModel::ApplyFilters(wxVirtualItemIDs &vFiltered,
         }
         ++it;
     }
+}
+
+//---------------------- HELPER METHOD FOR GetAllValues -------------//
+//hash set containing strings, doubles, ints, ...
+WX_DECLARE_HASH_SET(wxString, wxStringHash, wxStringEqual, TSetOfStrings);
+WX_DECLARE_HASH_SET(double, wxDoubleHash, wxDoubleEqual, TSetOfDoubles);
+WX_DECLARE_HASH_SET(long, wxIntegerHash, wxIntegerEqual, TSetOfLongs);
+WX_DECLARE_HASH_SET(int, wxIntegerHash, wxIntegerEqual, TSetOfBools);
+WX_DECLARE_HASH_SET(unsigned long, wxIntegerHash, wxIntegerEqual, TSetOfULongs);
+WX_DECLARE_HASH_SET(wxLongLong, wxLongLongHash, wxLongLongEqual, TSetOfLongLongs);
+WX_DECLARE_HASH_SET(wxULongLong, wxLongLongHash, wxLongLongEqual, TSetOfULongLongs);
+WX_DECLARE_HASH_SET(wxVariant, wxVariantHash, wxVariantEqual, TSetOfVariants);
+
+/** Helper method for getting all the values
+  * the main difference is that we want the filtered values, with all filters
+  * actives EXCEPT THE ONE in the CURRENT FIELD.
+  * The only way to do that is to:
+  *  - deactivate the filter if it exists
+  *  - get all values without filtering (forward to base model)
+  *  - filter the results using the remaining active filters
+  *  - reactivate the filters
+  */
+template<typename TSet, typename TArray, typename T>
+void wxVirtualFilteringDataModel::DoGetAllValues(TArray &rArray, size_t uiField,
+                                                 wxVirtualIStateModel *pStateModel)
+{
+    //special case: no master model
+    if (!m_pDataModel) return;
+
+    //special case : do not apply filter
+    if (!m_bApplyFiltersForGetAllValues)
+    {
+        m_pDataModel->GetAllValues(rArray, uiField, pStateModel);
+        return;
+    }
+
+    //check if the filter for the current field is active, and deactivate it if necessary
+    wxVirtualDataViewFilter *pFilter = GetFilter(uiField);
+    bool bIsFiltering = false;
+    if (pFilter)
+    {
+        if (pFilter->IsActive())
+        {
+            //it is filtering - deactivate the filter
+            bIsFiltering = true;
+            pFilter->SetInactive();
+        }
+    }
+
+    //get all values without the filter active
+    if (IsFiltering())
+    {
+        //at least 1 another filter is active - so we need to filter out the data
+        //No other ways than to iterate on all items
+        TSet oSetOfValues;
+        wxVirtualItemID id = m_pDataModel->GetRootItem();
+        while(!id.IsInvalid())
+        {
+            if (IsAcceptedNonRecursive(id))
+            {
+                wxVariant v = m_pDataModel->GetItemData(id, uiField, WX_ITEM_MAIN_DATA);
+                oSetOfValues.insert(wxGetVariantValueAs<T>(v));
+            }
+            id = m_pDataModel->NextItem(id, WX_VDV_NULL_PTR, 1);
+        }
+
+        //convert the set to an array
+        rArray.reserve(oSetOfValues.size());
+        typename TSet::iterator it      = oSetOfValues.begin();
+        typename TSet::iterator itEnd   = oSetOfValues.end();
+        while(it != itEnd)
+        {
+            rArray.push_back(*it);
+            ++it;
+        }
+    }
+    else
+    {
+        //no other filters active - forward to master model, which may have
+        //optimized this method
+        m_pDataModel->GetAllValues(rArray, uiField, pStateModel);
+    }
+
+    //reactivate the filter
+    if (bIsFiltering) pFilter->SetActive();
+}
+
+
+//----------- INTERFACE REIMPLEMENTATION FROM wxVirtualIDataModel ---//
+//------- FILTERING - GET ALL VALUES AS STRINGS ---------------------//
+/** Get all the values of a field
+  * \param rvStrings [output]: an array of string. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayString &rvStrings, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvStrings.Clear();
+    DoGetAllValues<TSetOfStrings, wxArrayString, wxString>(rvStrings, uiField, pStateModel);
+}
+
+//------- FILTERING - GET ALL VALUES AS BOOL ------------------------//
+/** Get all the values of a field
+  * \param rvBools [output]: an array of bool. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayBool &rvBools, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvBools.Clear();
+    DoGetAllValues<TSetOfBools, wxArrayBool, bool>(rvBools, uiField, pStateModel);
+}
+
+//------- FILTERING - GET ALL VALUES AS SIGNED INTEGERS -------------//
+/** Get all the values of a field
+  * \param rvShorts [output]: an array of shorts. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayShort &rvShorts, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvShorts.Clear();
+    DoGetAllValues<TSetOfLongs, wxArrayShort, short>(rvShorts, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvInts [output]: an array of int. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayInt &rvInts, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvInts.Clear();
+    DoGetAllValues<TSetOfLongs, wxArrayInt, int>(rvInts, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvLongs [output]: an array of long. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayLong &rvLongs, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvLongs.Clear();
+    DoGetAllValues<TSetOfLongs, wxArrayLong, long>(rvLongs, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvLongLongs [output]: an array of wxLongLong. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayLongLong &rvLongLongs, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvLongLongs.Clear();
+    DoGetAllValues<TSetOfLongLongs, wxArrayLongLong, wxLongLong>(rvLongLongs, uiField, pStateModel);
+}
+
+//------- FILTERING - GET ALL VALUES AS UNSIGNED INTEGERS -----------//
+/** Get all the values of a field
+  * \param rvUShorts [output]: an array of unsigned shorts. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayUShort &rvUShorts, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvUShorts.Clear();
+    DoGetAllValues<TSetOfULongs, wxArrayUShort, unsigned short>(rvUShorts, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvUInts [output]: an array of unsigned int. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayUInt &rvUInts, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvUInts.Clear();
+    DoGetAllValues<TSetOfULongs, wxArrayUInt, unsigned int>(rvUInts, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvULongs [output]: an array of unsigned long. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayULong &rvULongs, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvULongs.Clear();
+    DoGetAllValues<TSetOfULongs, wxArrayULong, unsigned long>(rvULongs, uiField, pStateModel);
+}
+
+/** Get all the values of a field
+  * \param rvULongLongs [output]: an array of wxULongLong. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayULongLong &rvULongLongs, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvULongLongs.Clear();
+    DoGetAllValues<TSetOfULongLongs, wxArrayULongLong, wxULongLong>(rvULongLongs, uiField, pStateModel);
+}
+
+//------- FILTERING - GET ALL VALUES AS FLOAT / DOUBLE --------------//
+/** Get all the values inside an array of floats
+  * \param rvFloats [output]: an array of floats. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayFloat &rvFloats, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvFloats.Clear();
+    DoGetAllValues<TSetOfDoubles, wxArrayFloat, double>(rvFloats, uiField, pStateModel);
+}
+
+/** Get all the values inside an array of doubles
+  * \param rvDoubles [output]: an array of doubles. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxArrayDouble &rvDoubles, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvDoubles.Clear();
+    DoGetAllValues<TSetOfDoubles, wxArrayDouble, double>(rvDoubles, uiField, pStateModel);
+}
+
+//------- FILTERING - GET ALL VALUES AS VARIANT ---------------------//
+/** Get all the values inside an array of variants
+  * \param rvVariants [output]: an array of variants. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualFilteringDataModel::GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                               wxVirtualIStateModel *pStateModel)
+{
+    rvVariants.clear();
+    DoGetAllValues<TSetOfVariants, wxVector<wxVariant>, wxVariant>(rvVariants, uiField, pStateModel);
 }

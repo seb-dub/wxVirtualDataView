@@ -139,6 +139,9 @@ bool wxVirtualDataViewColHeader::GetItemData(size_t uiItemID, TItemData &rData) 
         size_t uiSelectedCol = m_pOwner->GetFocusedColumn();
         if (uiSelectedCol == uiItemID) rData.m_bIsCurrent = true;
         else                           rData.m_bIsCurrent = false;
+
+
+        rData.m_bIsFiltering = m_pOwner->IsFiltering(uiItemID);
     }
     return(true);
 }

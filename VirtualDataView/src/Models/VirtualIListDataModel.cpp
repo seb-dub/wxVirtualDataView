@@ -81,7 +81,7 @@ int wxVirtualIListDataModel::GetModelClass(void) const
   * Default implementation return wxVariant().
   * Reimplementation is strongly encouraged
   */
-wxVariant wxVirtualIListDataModel::GetItemData(size_t uiItemID, size_t uiField, EDataType eType)
+wxVariant wxVirtualIListDataModel::GetListItemData(size_t uiItemID, size_t uiField, EDataType eType)
 {
     return(wxVariant());
 }
@@ -96,7 +96,7 @@ wxVariant wxVirtualIListDataModel::GetItemData(size_t uiItemID, size_t uiField, 
   * Default implementation return NULL
   * Reimplementation recommended for visually appealing controls
   */
-wxVirtualDataViewItemAttr* wxVirtualIListDataModel::GetItemAttribute(size_t uiItemID, size_t uiField, const wxVirtualDataViewItemState &rState)
+wxVirtualDataViewItemAttr* wxVirtualIListDataModel::GetListItemAttribute(size_t uiItemID, size_t uiField, const wxVirtualDataViewItemState &rState)
 {
     return(WX_VDV_NULL_PTR);
 }
@@ -109,7 +109,7 @@ wxVirtualDataViewItemAttr* wxVirtualIListDataModel::GetItemAttribute(size_t uiIt
   * Default implementation returns always WX_ITEM_FLAGS_ALL.
   * Reimplementation recommended for complex usage scenario
   */
-wxVirtualIDataModel::EFlags wxVirtualIListDataModel::GetItemFlags(size_t uiItemID, size_t uiField)
+wxVirtualIDataModel::EFlags wxVirtualIListDataModel::GetListItemFlags(size_t uiItemID, size_t uiField)
 {
     return(WX_ITEM_FLAGS_ALL);
 }
@@ -124,7 +124,7 @@ wxVirtualIDataModel::EFlags wxVirtualIListDataModel::GetItemFlags(size_t uiItemI
   * Default implementation does nothing and returns true.
   * Reimplement for read/write models
   */
-bool wxVirtualIListDataModel::SetItemData(size_t uiItemID, size_t uiField, const wxVariant &vValue, EDataType eType)
+bool wxVirtualIListDataModel::SetListItemData(size_t uiItemID, size_t uiField, const wxVariant &vValue, EDataType eType)
 {
     return(true);
 }
@@ -217,7 +217,7 @@ size_t wxVirtualIListDataModel::GetFieldCount(const wxVirtualItemID &rID)
 wxVariant wxVirtualIListDataModel::GetItemData(const wxVirtualItemID &rID, size_t uiField, EDataType eType)
 {
     if (!rID.IsOK()) return(wxVariant());
-    return(GetItemData(DoGetRowIndex(rID), uiField, eType));
+    return(GetListItemData(DoGetRowIndex(rID), uiField, eType));
 }
 
 /** Get the item graphic attributes
@@ -233,7 +233,7 @@ wxVariant wxVirtualIListDataModel::GetItemData(const wxVirtualItemID &rID, size_
 wxVirtualDataViewItemAttr* wxVirtualIListDataModel::GetItemAttribute(const wxVirtualItemID &rID, size_t uiField, const wxVirtualDataViewItemState &rState)
 {
     if (!rID.IsOK()) return(WX_VDV_NULL_PTR);
-    return(GetItemAttribute(DoGetRowIndex(rID), uiField, rState));
+    return(GetListItemAttribute(DoGetRowIndex(rID), uiField, rState));
 }
 
 /** Get the item flags
@@ -247,7 +247,7 @@ wxVirtualDataViewItemAttr* wxVirtualIListDataModel::GetItemAttribute(const wxVir
 wxVirtualIListDataModel::EFlags wxVirtualIListDataModel::GetItemFlags(const wxVirtualItemID &rID, size_t uiField)
 {
     if (!rID.IsOK()) return(WX_ITEM_FLAGS_ALL);
-    return(GetItemFlags(DoGetRowIndex(rID), uiField));
+    return(GetListItemFlags(DoGetRowIndex(rID), uiField));
 }
 
 /** Set the item data
@@ -263,7 +263,7 @@ wxVirtualIListDataModel::EFlags wxVirtualIListDataModel::GetItemFlags(const wxVi
 bool wxVirtualIListDataModel::SetItemData(const wxVirtualItemID &rID, size_t uiField, const wxVariant &vValue, EDataType eType)
 {
     if (!rID.IsOK()) return(false);
-    return(SetItemData(DoGetRowIndex(rID), uiField, vValue, eType));
+    return(SetListItemData(DoGetRowIndex(rID), uiField, vValue, eType));
 }
 
 //--------------------- INTERFACE WITH COMMON IMPLEMENTATION --------//

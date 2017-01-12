@@ -147,6 +147,7 @@ class WXDLLIMPEXP_VDV wxVirtualHeaderCtrl : public wxSystemThemedControl<wxContr
             bool                    m_bIsHotTracked;                                    ///< \brief true if the item is hot-tracked (mouse hovering on it)
             bool                    m_bIsPushed;                                        ///< \brief true if the item is pushed (mouse button down)
             bool                    m_bIsVisible;                                       ///< \brief true if the item is visible
+            bool                    m_bIsFiltering;                                     ///< \brief true if a filter is currently applied on the item
         };
 
         //constructors & destructor

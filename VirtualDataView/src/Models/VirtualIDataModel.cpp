@@ -1359,11 +1359,11 @@ wxVirtualIDataModel::ECompareResult wxVirtualIDataModel::Compare(const wxVirtual
 //hash set containing strings, doubles
 WX_DECLARE_HASH_SET(wxString, wxStringHash, wxStringEqual, TSetOfStrings);
 WX_DECLARE_HASH_SET(double, wxDoubleHash, wxDoubleEqual, TSetOfDoubles);
-WX_DECLARE_HASH_SET(long, wxIntegerHash, wxIntegerEqual, TSetOfLong);
-WX_DECLARE_HASH_SET(int, wxIntegerHash, wxIntegerEqual, TSetOfBool);
-WX_DECLARE_HASH_SET(unsigned long, wxIntegerHash, wxIntegerEqual, TSetOfULong);
-WX_DECLARE_HASH_SET(wxLongLong, wxLongLongHash, wxLongLongEqual, TSetOfLongLong);
-WX_DECLARE_HASH_SET(wxULongLong, wxLongLongHash, wxLongLongEqual, TSetOfULongLong);
+WX_DECLARE_HASH_SET(long, wxIntegerHash, wxIntegerEqual, TSetOfLongs);
+WX_DECLARE_HASH_SET(int, wxIntegerHash, wxIntegerEqual, TSetOfBools);
+WX_DECLARE_HASH_SET(unsigned long, wxIntegerHash, wxIntegerEqual, TSetOfULongs);
+WX_DECLARE_HASH_SET(wxLongLong, wxLongLongHash, wxLongLongEqual, TSetOfLongLongs);
+WX_DECLARE_HASH_SET(wxULongLong, wxLongLongHash, wxLongLongEqual, TSetOfULongLongs);
 WX_DECLARE_HASH_SET(wxVariant, wxVariantHash, wxVariantEqual, TSetOfVariants);
 
 
@@ -1507,7 +1507,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayString &rvStrings, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayBool &rvBools, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayBool, TSetOfBool, bool>(rvBools, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayBool, TSetOfBools, bool>(rvBools, this, uiField, pStateModel);
 }
 
 //------- FILTERING - GET ALL VALUES AS SIGNED INTEGERS -------------//
@@ -1531,7 +1531,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayBool &rvBools, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayShort &rvShorts, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayShort, TSetOfLong, short>(rvShorts, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayShort, TSetOfLongs, short>(rvShorts, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1554,7 +1554,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayShort &rvShorts, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayInt &rvInts, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayInt, TSetOfLong, int>(rvInts, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayInt, TSetOfLongs, int>(rvInts, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1577,7 +1577,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayInt &rvInts, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayLong &rvLongs, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayLong, TSetOfLong, long>(rvLongs, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayLong, TSetOfLongs, long>(rvLongs, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1600,7 +1600,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayLong &rvLongs, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayLongLong &rvLongLongs, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayLongLong, TSetOfLongLong, wxLongLong>(rvLongLongs, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayLongLong, TSetOfLongLongs, wxLongLong>(rvLongLongs, this, uiField, pStateModel);
 }
 
 //------- FILTERING - GET ALL VALUES AS UNSIGNED INTEGERS -----------//
@@ -1624,7 +1624,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayLongLong &rvLongLongs, size_t uiFi
 void wxVirtualIDataModel::GetAllValues(wxArrayUShort &rvUShorts, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayUShort, TSetOfULong, unsigned short>(rvUShorts, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayUShort, TSetOfULongs, unsigned short>(rvUShorts, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1647,7 +1647,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayUShort &rvUShorts, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayUInt &rvUInts, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayUInt, TSetOfULong, unsigned int>(rvUInts, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayUInt, TSetOfULongs, unsigned int>(rvUInts, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1670,7 +1670,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayUInt &rvUInts, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayULong &rvULongs, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayULong, TSetOfULong, unsigned long>(rvULongs, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayULong, TSetOfULongs, unsigned long>(rvULongs, this, uiField, pStateModel);
 }
 
 /** Get all the values of a field
@@ -1693,7 +1693,7 @@ void wxVirtualIDataModel::GetAllValues(wxArrayULong &rvULongs, size_t uiField,
 void wxVirtualIDataModel::GetAllValues(wxArrayULongLong &rvULongLongs, size_t uiField,
                                        wxVirtualIStateModel *pStateModel)
 {
-    DoGetAllValues<wxArrayULongLong, TSetOfULongLong, wxULongLong>(rvULongLongs, this, uiField, pStateModel);
+    DoGetAllValues<wxArrayULongLong, TSetOfULongLongs, wxULongLong>(rvULongLongs, this, uiField, pStateModel);
 }
 
 //------- FILTERING - GET ALL VALUES AS FLOAT / DOUBLE --------------//

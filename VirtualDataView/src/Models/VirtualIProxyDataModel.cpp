@@ -807,6 +807,333 @@ wxVirtualIDataModel::ECompareResult wxVirtualIProxyDataModel::Compare(const wxVi
     return(WX_E_EQUAL);
 }
 
+//------- FILTERING - GET ALL VALUES AS STRINGS ---------------------//
+/** Get all the values of a field
+  * \param rvStrings [output]: an array of string. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayString &rvStrings, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvStrings, uiField, pStateModel);
+    else              rvStrings.Clear();
+}
+
+//------- FILTERING - GET ALL VALUES AS BOOL ------------------------//
+/** Get all the values of a field
+  * \param rvBools [output]: an array of bool. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayBool &rvBools, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvBools, uiField, pStateModel);
+    else              rvBools.Clear();
+}
+
+//------- FILTERING - GET ALL VALUES AS SIGNED INTEGERS -------------//
+/** Get all the values of a field
+  * \param rvShorts [output]: an array of shorts. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayShort &rvShorts, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvShorts, uiField, pStateModel);
+    else              rvShorts.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvInts [output]: an array of int. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayInt &rvInts, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvInts, uiField, pStateModel);
+    else              rvInts.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvLongs [output]: an array of long. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayLong &rvLongs, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvLongs, uiField, pStateModel);
+    else              rvLongs.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvLongLongs [output]: an array of wxLongLong. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayLongLong &rvLongLongs, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvLongLongs, uiField, pStateModel);
+    else              rvLongLongs.Clear();
+}
+
+//------- FILTERING - GET ALL VALUES AS UNSIGNED INTEGERS -----------//
+/** Get all the values of a field
+  * \param rvUShorts [output]: an array of unsigned shorts. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayUShort &rvUShorts, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvUShorts, uiField, pStateModel);
+    else              rvUShorts.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvUInts [output]: an array of unsigned int. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayUInt &rvUInts, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvUInts, uiField, pStateModel);
+    else              rvUInts.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvULongs [output]: an array of unsigned long. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayULong &rvULongs, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvULongs, uiField, pStateModel);
+    else              rvULongs.Clear();
+}
+
+/** Get all the values of a field
+  * \param rvULongLongs [output]: an array of wxULongLong. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayULongLong &rvULongLongs, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvULongLongs, uiField, pStateModel);
+    else              rvULongLongs.Clear();
+}
+
+//------- FILTERING - GET ALL VALUES AS FLOAT / DOUBLE --------------//
+/** Get all the values inside an array of floats
+  * \param rvFloats [output]: an array of floats. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayFloat &rvFloats, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvFloats, uiField, pStateModel);
+    else              rvFloats.Clear();
+}
+
+/** Get all the values inside an array of doubles
+  * \param rvDoubles [output]: an array of doubles. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxArrayDouble &rvDoubles, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvDoubles, uiField, pStateModel);
+    else              rvDoubles.Clear();
+}
+
+//------- FILTERING - GET ALL VALUES AS VARIANT ---------------------//
+/** Get all the values inside an array of variants
+  * \param rvVariants [output]: an array of variants. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void wxVirtualIProxyDataModel::GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                            wxVirtualIStateModel *pStateModel)
+{
+
+    if (m_pDataModel) m_pDataModel->GetAllValues(rvVariants, uiField, pStateModel);
+    else              rvVariants.clear();
+}
 
 
 //------------------------ PROXY DATA MODEL -------------------------//

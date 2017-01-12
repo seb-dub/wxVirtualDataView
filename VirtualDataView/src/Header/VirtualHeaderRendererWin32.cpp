@@ -102,6 +102,16 @@ WX_VDV_INLINE bool DoDrawHeaderBackground(wxUxThemeEngine *pThemeEngine,
     //draw
     bool bResult = DoDrawHeaderBackground(pThemeEngine, rhTheme, hWnd, hDC, rRect, iState);
 
+    //filtering : draw a pink rectangle (RGB = 255, 192, 203)
+//    if (rData.m_bIsFiltering)
+//    {
+//        RECT rFilterRect = rRect;
+//        rFilterRect.top = (rRect.bottom - rRect.top) / 2;
+//        HBRU::DeleteObject(hBr);SH hBr = ::CreateSolidBrush(RGB(255, 192, 203));
+//        ::FillRect(hDC, &rFilterRect, hBr);
+//        ::DeleteObject(hBr);
+//    }
+
     //special case : use selection colour when selected
     if ((rData.m_bIsCurrent) && (rData.m_SelectionColour.IsOk()))
     {
@@ -112,6 +122,7 @@ WX_VDV_INLINE bool DoDrawHeaderBackground(wxUxThemeEngine *pThemeEngine,
         rDeflatedRect.right  -= 1;
         HBRUSH hBr = ::CreateSolidBrush(rData.m_SelectionColour.GetPixel());
         FillRect(hDC, &rDeflatedRect, hBr);
+        ::DeleteObject(hBr);
         return(true);
     }
 
@@ -318,25 +329,34 @@ WX_VDV_INLINE bool DoDrawHeaderContent(wxUxThemeEngine *pThemeEngine,
     }
 
     //content : text label
-    if ((rData.m_FontLabel.IsOk()) || (rData.m_LabelColour.IsOk()))
+    if (rData.m_bIsFiltering)
     {
-        //override theme font or colour
-        HGDIOBJ hOldFont = WX_VDV_NULL_PTR;
-        COLORREF cOldColor = 0x00000000;
-        if (rData.m_FontLabel.IsOk())   hOldFont = ::SelectObject(hDC, rData.m_FontLabel.GetHFONT());
-        if (rData.m_LabelColour.IsOk()) cOldColor = ::SetTextColor(hDC, rData.m_LabelColour.GetPixel());
+        COLORREF cOldColor = ::SetTextColor(hDC, RGB(0, 0, 255));
         ::DrawText(hDC, (const wchar_t*) rData.m_sLabel.c_str(), -1, &rRect, dwFormat);
-
-        if (rData.m_FontLabel.IsOk())  ::SelectObject(hDC, hOldFont);
-        if (rData.m_LabelColour.IsOk()) ::SetTextColor(hDC, cOldColor);
+        ::SetTextColor(hDC, cOldColor);
     }
     else
     {
-        hr = pThemeEngine->DrawThemeText(rhTheme, hDC, iPart, iState,
-                                         (const wchar_t*) rData.m_sLabel.c_str(), -1,
-                                         dwFormat, 0,
-                                         &rRect);
-        if (FAILED(hr)) return(false);
+        if ((rData.m_FontLabel.IsOk()) || (rData.m_LabelColour.IsOk()))
+        {
+            //override theme font or colour
+            HGDIOBJ hOldFont = WX_VDV_NULL_PTR;
+            COLORREF cOldColor = 0x00000000;
+            if (rData.m_FontLabel.IsOk())   hOldFont = ::SelectObject(hDC, rData.m_FontLabel.GetHFONT());
+            if (rData.m_LabelColour.IsOk()) cOldColor = ::SetTextColor(hDC, rData.m_LabelColour.GetPixel());
+            ::DrawText(hDC, (const wchar_t*) rData.m_sLabel.c_str(), -1, &rRect, dwFormat);
+
+            if (rData.m_FontLabel.IsOk())  ::SelectObject(hDC, hOldFont);
+            if (rData.m_LabelColour.IsOk()) ::SetTextColor(hDC, cOldColor);
+        }
+        else
+        {
+            hr = pThemeEngine->DrawThemeText(rhTheme, hDC, iPart, iState,
+                                             (const wchar_t*) rData.m_sLabel.c_str(), -1,
+                                             dwFormat, 0,
+                                             &rRect);
+            if (FAILED(hr)) return(false);
+        }
     }
 
     //content : sort arrow

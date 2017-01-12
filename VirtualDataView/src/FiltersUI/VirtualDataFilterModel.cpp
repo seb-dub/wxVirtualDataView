@@ -54,7 +54,7 @@ WX_VDV_INLINE void DoGetRealItemIndex(size_t &uiIndex, const wxVector<size_t> &v
     if (uiIndex >= uiNbSpecials)
     {
         uiIndex -= uiNbSpecials;
-        if (uiIndex <= vIndicesArray.size()) uiIndex = vIndicesArray[uiIndex];
+        if (uiIndex < vIndicesArray.size()) uiIndex = vIndicesArray[uiIndex];
         uiIndex += uiNbSpecials;
     }
 }
@@ -75,7 +75,7 @@ WX_VDV_INLINE size_t wxVirtualDataFilterModel::GetRealItemIndex(size_t uiIndex) 
     {
         DoGetRealItemIndex(uiUnfilteredRow, m_vFilteredValues, m_bHasBlankItem, m_bHasNonBlankItem);
     }
-    return(uiIndex);
+    return(uiUnfilteredRow);
 }
 
 /** Compute an item ID from a row index
@@ -90,8 +90,8 @@ wxVirtualItemID wxVirtualDataFilterModel::GetItemID(size_t uiRowIndex) const
     //  col = 0
 
     //indexed list item ID
-    //  ID = real row index + 1
-    //  row = filtered row index + 1
+    //  ID = real row index + 1 (index in m_vValues)
+    //  row = filtered row index + 1 (index of visible row)
     //  col = 0
     size_t uiFilteredRow  = uiRowIndex + 1;
     size_t uiUnfilteredRow = GetRealItemIndex(uiRowIndex);
@@ -131,7 +131,7 @@ size_t wxVirtualDataFilterModel::GetItemCount(void)
   * \param eType [input] : the kind of data to get
   * \return the data of the item. Return invalid variant if no data is associated
   */
-wxVariant wxVirtualDataFilterModel::GetItemData(size_t uiItemID,  size_t uiField, EDataType eType)
+wxVariant wxVirtualDataFilterModel::GetListItemData(size_t uiItemID,  size_t uiField, EDataType eType)
 {
     //non data
     if (eType != WX_ITEM_MAIN_DATA) return(wxVariant());
@@ -174,7 +174,7 @@ wxVariant wxVirtualDataFilterModel::GetItemData(size_t uiItemID,  size_t uiField
   * \return a pointer to the graphic attributes for this item. The data is owned by the model.
   *         returning a NULL Pointer is valid: the default attributes will be used
   */
-wxVirtualDataViewItemAttr* wxVirtualDataFilterModel::GetItemAttribute(size_t uiItemID, size_t uiField,
+wxVirtualDataViewItemAttr* wxVirtualDataFilterModel::GetListItemAttribute(size_t uiItemID, size_t uiField,
                                                                       const wxVirtualDataViewItemState &rState)
 {
     return(WX_VDV_NULL_PTR);

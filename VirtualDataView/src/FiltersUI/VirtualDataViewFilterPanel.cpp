@@ -18,6 +18,7 @@
 #include <wx/VirtualDataView/FiltersUI/VirtualDataFilterModel.h>
 #include <wx/VirtualDataView/Filters/VirtualDataViewStringFilter.h>
 #include <wx/VirtualDataView/Generic/ThemedSearchCtrl.h>
+#include <wx/VirtualDataView/StateModels/VirtualIStateModel.h>
 #include <wx/VirtualDataView/Types/VariantUtils.h>
 #include <wx/sizer.h>
 #include <wx/button.h>
@@ -159,6 +160,34 @@ void wxVirtualDataViewFilterPanel::BuildContents(void)
     pMainSizer->Add(pSelectButtonSizer, 0, wxGROW);
     pMainSizer->Add(m_pFilterCtrl, 1, wxGROW, 0);
     pMainSizer->Add(pButtonSizer, 0, wxGROW);
+
+    //ensure that at least 5 items are visible
+    size_t uiCount = 5;
+    wxVirtualDataFilterModel *pFilterModel = m_pFilterCtrl->GetFilterDataModel();
+    if (pFilterModel) uiCount = pFilterModel->GetItemCount();
+    wxSize sBestSize = pMainSizer->GetMinSize();
+    wxSize sMinSize(sBestSize);
+    if (uiCount < 5)
+    {
+        wxVirtualItemID idRoot = m_pFilterCtrl->GetRootItem();
+        wxRect rRectItem;
+        m_pFilterCtrl->GetItemRect(rRectItem, idRoot);
+
+        wxSize sFilterMinSize = m_pFilterCtrl->GetMinSize();
+
+        int iHeight = rRectItem.GetHeight() * 5;
+        int iMinHeight = sFilterMinSize.GetHeight();
+        int iDiff = iHeight - iMinHeight;
+        if (iDiff > 0)
+        {
+            iHeight = sMinSize.GetHeight();
+            iHeight += iDiff;
+            sMinSize.SetHeight(iHeight);
+        }
+    }
+    m_pFilterCtrl->SetMinSize(sMinSize);
+    SetMinSize(sMinSize);
+    if (GetParent()) GetParent()->SetMinClientSize(sMinSize);
     SetSizerAndFit(pMainSizer);
 }
 
@@ -171,7 +200,10 @@ void wxVirtualDataViewFilterPanel::BuildContents(void)
 void wxVirtualDataViewFilterPanel::InitFilter(wxVirtualIDataModel *pSrcModel, size_t uiField, wxVirtualIStateModel *pStateModel)
 {
     wxVirtualDataViewFilterCtrl *pFilterCtrl = GetFilterControl();
-    if (pFilterCtrl) pFilterCtrl->InitFilter(pSrcModel, uiField, pStateModel);
+    if (pFilterCtrl)
+    {
+        pFilterCtrl->InitFilter(pSrcModel, uiField, pStateModel);
+    }
     InvalidateBestSize();
     if (GetParent()) GetParent()->InvalidateBestSize();
 }
@@ -199,6 +231,29 @@ wxVirtualDataViewFilter* wxVirtualDataViewFilterPanel::GenerateFilter(void)
 bool wxVirtualDataViewFilterPanel::UpdateFilter(wxVirtualDataViewFilter *pFilter)
 {
     if (!pFilter) return(false);
+
+    //special case
+    if (!m_pFilterCtrl) return(false);
+
+    wxVirtualDataFilterModel *pDataModel = m_pFilterCtrl->GetFilterDataModel();
+    if (!pDataModel) return(false);
+
+    wxVirtualIStateModel *pStateModel = m_pFilterCtrl->GetStateModel();
+    if (!pStateModel) return(false);
+
+    //easy case : everything is checked
+    size_t uiCount = pDataModel->GetItemCount();
+    size_t i, uiNbChecked;
+    uiNbChecked = 0;
+    for(i=0;i<uiCount;i++)
+    {
+        wxVirtualItemID id = pDataModel->GetItemID(i);
+        if (pStateModel->GetCheck(id) == wxVirtualIStateModel::WX_CHECKSTATE_CHECKED) uiNbChecked++;
+        else break;
+    }
+    if (uiNbChecked == uiCount) return(false);
+
+    //now we need to use a real filter
     wxVirtualDataViewStringFilter *pStringFilter;
     pStringFilter = reinterpret_cast<wxVirtualDataViewStringFilter*>(pFilter);
 
@@ -209,22 +264,29 @@ bool wxVirtualDataViewFilterPanel::UpdateFilter(wxVirtualDataViewFilter *pFilter
 
     wxArrayString vValues;
 
-    if (m_pFilterCtrl)
+    for(i=0;i<uiCount;i++)
     {
-        wxVirtualIDataModel *pDataModel = m_pFilterCtrl->GetDataModel();
-        if (!pDataModel)
-        {
-            pStringFilter->SetReferenceValue(vValues);
-            return(true);
-        }
-        wxVirtualItemID id = m_pFilterCtrl->GetFirstCheckedItem(wxVirtualDataViewCtrl::WX_CHECKSTATE_CHECKED);
-        while (!id.IsInvalid())
-        {
-            wxVariant v = pDataModel->GetItemData(id, 0);
-            vValues.push_back(GetStringValue(v));
-            id = m_pFilterCtrl->GetNextCheckedItem(id, wxVirtualDataViewCtrl::WX_CHECKSTATE_CHECKED);
-        }
+        wxVirtualItemID id = pDataModel->GetItemID(i);
+        if (pStateModel->GetCheck(id) != wxVirtualIStateModel::WX_CHECKSTATE_CHECKED) continue;
+
+        wxVariant v = pDataModel->GetItemData(id, 0);
+        vValues.push_back(GetStringValue(v));
     }
+
+    //do not do it like that, because a search filter might be active in the filter control
+//    wxVirtualIDataModel *pDataModel = m_pFilterCtrl->GetDataModel();
+//    if (!pDataModel)
+//    {
+//        pStringFilter->SetReferenceValue(vValues);
+//        return(true);
+//    }
+//    wxVirtualItemID id = m_pFilterCtrl->GetFirstCheckedItem(wxVirtualDataViewCtrl::WX_CHECKSTATE_CHECKED);
+//    while (!id.IsInvalid())
+//    {
+//        wxVariant v = pDataModel->GetItemData(id, 0);
+//        vValues.push_back(GetStringValue(v));
+//        id = m_pFilterCtrl->GetNextCheckedItem(id, wxVirtualDataViewCtrl::WX_CHECKSTATE_CHECKED);
+//    }
 
     pStringFilter->SetReferenceValue(vValues);
     return(true);

@@ -34,10 +34,10 @@ class WXDLLIMPEXP_VDV wxVirtualDataFilterModel : public wxVirtualIListDataModel
         virtual int GetModelClass(void) const;                                              ///< \brief get the model class flags
 
         //new interface : item data
-        virtual wxVariant GetItemData(size_t uiItemID,
+        virtual wxVariant GetListItemData(size_t uiItemID,
                                       size_t uiField = 0,
                                       EDataType eType = WX_ITEM_MAIN_DATA);                 ///< \brief get the item data
-        virtual wxVirtualDataViewItemAttr* GetItemAttribute(size_t uiItemID,
+        virtual wxVirtualDataViewItemAttr* GetListItemAttribute(size_t uiItemID,
                                                             size_t uiField,
                                               const wxVirtualDataViewItemState &rState);    ///< \brief get the item graphic attributes
 

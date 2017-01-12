@@ -168,6 +168,16 @@ void wxVirtualDataViewStdFilterEditor::InitFilter(wxVirtualIDataModel *pSrcModel
     if (m_pComboBox) m_pComboBox->InitFilter(pSrcModel, uiField, pStateModel);
 }
 
+/** Check if the filter is currently filtering something
+  * \return true if a filter is currently active, false otherwise
+  */
+bool wxVirtualDataViewStdFilterEditor::IsFiltering(void)
+{
+    if (!m_pComboBoxState) return(false);
+    if (m_pComboBoxState->GetValue() == wxEmptyString) return(false);
+    return(true);
+}
+
 //--------------------- INTERNAL METHODS ----------------------------//
 /** Copy object
   * \param rhs [input]: the object to copy

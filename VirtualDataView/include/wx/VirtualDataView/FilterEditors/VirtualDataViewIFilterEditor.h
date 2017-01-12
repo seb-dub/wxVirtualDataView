@@ -104,6 +104,7 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewIFilterEditor : public wxEvtHandler
         virtual void      InitFilter(wxVirtualIDataModel *pSrcModel,
                                      size_t uiField,
                                      wxVirtualIStateModel *pStateModel)     = 0;    ///< \brief initialize the filter
+        virtual bool      IsFiltering(void)                                 = 0;    ///< \brief check if the filter is currently filtering something
 
         //interface for filter
         virtual wxVirtualDataViewFilter* GetFilter(void);                           ///< \brief get the filter

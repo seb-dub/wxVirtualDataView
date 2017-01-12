@@ -1075,6 +1075,8 @@ void wxVirtualDataViewCtrl::OnColHeaderLayout(wxVirtualHeaderCtrlEvent &rEvent)
   */
 void wxVirtualDataViewCtrl::OnColHeaderFilterBegin(wxVirtualHeaderCtrlEvent &rEvent)
 {
+    RefreshAll();
+
     if (!m_pColumnHeaderWindow) return;
     size_t uiColID = rEvent.GetItemID();
     wxVirtualDataViewIFilterEditor *pFilterEditor = m_pColumnHeaderWindow->GetFilterEditor(uiColID);
@@ -3398,4 +3400,133 @@ void wxVirtualDataViewCtrl::ApplyFilters(void)
     //refresh
     m_pClientArea->OnDataModelChanged();
     RefreshDataView();
+}
+
+/** Return true if filters are shown
+  * \return true if filters are shown, false otherwise
+  */
+bool wxVirtualDataViewCtrl::AreFiltersShown(void) const
+{
+    if (m_pColumnHeaderWindow) return(m_pColumnHeaderWindow->AreFiltersShown());
+    return(false);
+}
+
+/** Return true if filters are hidden
+  * \return true if filters are hidden, false otherwise
+  */
+bool wxVirtualDataViewCtrl::AreFiltersHidden(void) const
+{
+    if (m_pColumnHeaderWindow) return(m_pColumnHeaderWindow->AreFiltersHidden());
+    return(false);
+}
+
+
+/** Show / hide filters
+  * \param bShow [input]: true for showing the filters, false for hiding them
+  * Showing / hiding the filters will probably change the window size, so a re-layouting of the parent is
+  * probably necessary. This task has to be done by the caller
+  */
+void wxVirtualDataViewCtrl::ShowFilters(bool bShow)
+{
+    if (m_pColumnHeaderWindow) m_pColumnHeaderWindow->ShowFilters(bShow);
+}
+
+/** Hide / show filters
+  * \param bHide [input]: true for hiding the filters, false for showing them
+  * Showing / hiding the filters will probably change the window size, so a re-layouting of the parent is
+  * probably necessary. This task has to be
+  */
+void wxVirtualDataViewCtrl::HideFilters(bool bHide)
+{
+    if (m_pColumnHeaderWindow) m_pColumnHeaderWindow->HideFilters(bHide);
+}
+
+/** Show filters ON/OFF
+  * Showing / hiding the filters will probably change the window size, so a re-layouting of the parent is
+  * probably necessary. This task has to be
+  */
+void wxVirtualDataViewCtrl::ToggleFilters(void)
+{
+    if (m_pColumnHeaderWindow) m_pColumnHeaderWindow->ToggleFilters();
+}
+
+/** Start edition of a filter
+  * \param uiCol [input]: the filter to activate
+  * \return true if the filter was activated, false otherwise
+  */
+bool wxVirtualDataViewCtrl::StartFilter(size_t uiCol)
+{
+    if (m_pColumnHeaderWindow) return(m_pColumnHeaderWindow->StartFilter(uiCol));
+    return(false);
+}
+
+/** Finish edition of a filter
+  * \return true if the filter was deactivated, false otherwise
+  */
+bool wxVirtualDataViewCtrl::EndFilter(void)
+{
+    if (m_pColumnHeaderWindow) return(m_pColumnHeaderWindow->EndFilter());
+    return(true);
+}
+
+/** Check if the filter is active and not empty
+  * \param uiCol [input] : the index of the column to check
+  * \return true if a filter is active and not empty
+  *         false otherwise
+  */
+bool wxVirtualDataViewCtrl::IsFiltering(size_t uiCol)
+{
+    size_t uiNbCols = m_vColumns.GetColumnsCount();
+    if (uiCol >= uiNbCols) return(false);
+
+    //get column
+    wxVirtualDataViewColumn *pCol = m_vColumns.GetColumn(uiCol);
+    if (!pCol) return(false);
+
+    //get filter editor
+    wxVirtualDataViewIFilterEditor *pFilterEditor = pCol->GetFilterEditor();
+    if (!pFilterEditor) return(false);
+
+    //check
+    if (!pFilterEditor->IsFiltering()) return(false);
+
+    //get filter
+    wxVirtualDataViewFilter* pFilter = pFilterEditor->GetFilter();
+    if (!pFilter) return(false);
+
+    //check
+    if (!pFilter->IsActive()) return(false);
+    return(true);
+
+}
+
+/** Check if at least one filter is active and not empty
+  * \return true if at least 1 filter is active and not empty
+  *         false otherwise
+  */
+bool wxVirtualDataViewCtrl::IsFiltering(void)
+{
+    size_t uiCol;
+    size_t uiNbCols = m_vColumns.GetColumnsCount();
+    for(uiCol = 0; uiCol < uiNbCols; uiCol++)
+    {
+        //get column
+        wxVirtualDataViewColumn *pCol = m_vColumns.GetColumn(uiCol);
+        if (!pCol) continue;
+
+        //get filter editor
+        wxVirtualDataViewIFilterEditor *pFilterEditor = pCol->GetFilterEditor();
+        if (!pFilterEditor) continue;
+
+        //check
+        if (!pFilterEditor->IsFiltering()) continue;
+
+        //get filter
+        wxVirtualDataViewFilter* pFilter = pFilterEditor->GetFilter();
+        if (!pFilter) continue;
+
+        //check
+        if (pFilter->IsActive()) return(true);
+    }
+    return(false);
 }

@@ -84,8 +84,7 @@
 			<Add library="uuid" />
 			<Add directory="$(#wx.gcc_lib64)" />
 		</Linker>
-		<Unit filename="DesignDoc.txt" />
-		<Unit filename="README.txt" />
+		<Unit filename="README.md" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttr.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttrProvider.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewDefaultCellAttr.h" />

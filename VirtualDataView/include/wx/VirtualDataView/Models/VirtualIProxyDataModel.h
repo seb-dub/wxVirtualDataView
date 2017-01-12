@@ -142,6 +142,44 @@ class WXDLLIMPEXP_VDV wxVirtualIProxyDataModel : public wxVirtualIDataModel
         virtual void Sort(const TSortFilters &vSortFilters);                                ///< \brief sort the values
         virtual void ResetSorting(void);                                                    ///< \brief remove all sort filters
 
+        //filtering - get all values as string
+        virtual void GetAllValues(wxArrayString &rvStrings, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of strings
+
+        //filtering - get all values as bool
+        virtual void GetAllValues(wxArrayBool &rvBools, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of bool
+
+        //filtering - get all values as signed integers
+        virtual void GetAllValues(wxArrayShort &rvShorts, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of short
+        virtual void GetAllValues(wxArrayInt &rvInts, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of int
+        virtual void GetAllValues(wxArrayLong &rvLongs, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of long
+        virtual void GetAllValues(wxArrayLongLong &rvLongLongs, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of longlong
+
+        //filtering - get all values as unsigned integers
+        virtual void GetAllValues(wxArrayUShort &rvUShorts, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of unsigned short
+        virtual void GetAllValues(wxArrayUInt &rvUInts, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of unsigned int
+        virtual void GetAllValues(wxArrayULong &rvULongs, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of unsigned long
+        virtual void GetAllValues(wxArrayULongLong &rvULongLongs, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of unsigned longlong
+
+        //filtering - get all values as floats/doubles
+        virtual void GetAllValues(wxArrayFloat &rvFloats, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of floats
+        virtual void GetAllValues(wxArrayDouble &rvDoubles, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of doubles
+
+        //filtering - get all values as variants
+        virtual void GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of variants
+
         //sorting comparison functors
         virtual ECompareResult  Compare(const wxVirtualItemID &rID1,
                                         const wxVirtualItemID &rID2,

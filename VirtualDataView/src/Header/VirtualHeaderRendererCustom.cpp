@@ -268,6 +268,7 @@ WX_VDV_INLINE void wxVirtualHeaderRendererCustom::DoDrawHeaderContent(wxDC &rDC,
     wxColour cColour = m_Settings[eSettings].m_cTextColour;
     if (rData.m_LabelColour.IsOk()) cColour = rData.m_LabelColour;
     if (!cColour.IsOk()) cColour = rDC.GetTextForeground();
+    if (rData.m_bIsFiltering) cColour = *wxBLUE;
 
     wxDCFontChanger dcFont(rDC, f);
     wxDCTextColourChanger dcTextColour(rDC, cColour);

@@ -123,9 +123,22 @@ WX_VDV_INLINE void DoDrawContentGeneric(wxWindow *pWin, wxDC &rDC, const wxRect 
     if (rData.m_bIsCurrent)    iFlags |= wxCONTROL_SELECTED;
     if (rData.m_bIsPushed)     iFlags |= wxCONTROL_PRESSED;
 
-    GetRenderer().DrawHeaderButtonContents(pWin, rDC, r, iFlags,
-                                           rData.m_eSortIconType,
-                                           (wxHeaderButtonParams*) &rData);
+    wxHeaderButtonParams* pData = (wxHeaderButtonParams *) &rData;
+    if (rData.m_bIsFiltering)
+    {
+        wxHeaderButtonParams rHData = *pData;
+        rHData.m_labelColour = wxColour(0, 0, 255);
+        GetRenderer().DrawHeaderButtonContents(pWin, rDC, r, iFlags,
+                                               rData.m_eSortIconType,
+                                               &rHData);
+    }
+    else
+    {
+        GetRenderer().DrawHeaderButtonContents(pWin, rDC, r, iFlags,
+                                               rData.m_eSortIconType,
+                                               pData);
+    }
+
 }
 
 /** Draw the header content + background - static
@@ -143,9 +156,23 @@ WX_VDV_INLINE void DoDrawHeaderGeneric(wxWindow *pWin, wxDC &rDC, const wxRect &
     if (rData.m_bIsCurrent)    iFlags |= wxCONTROL_SELECTED;
     if (rData.m_bIsPushed)     iFlags |= wxCONTROL_PRESSED;
 
-    GetRenderer().DrawHeaderButton(pWin, rDC, r, iFlags,
-                                   rData.m_eSortIconType,
-                                   (wxHeaderButtonParams*) &rData);
+
+
+    wxHeaderButtonParams* pData = (wxHeaderButtonParams *) &rData;
+    if (rData.m_bIsFiltering)
+    {
+        wxHeaderButtonParams rHData = *pData;
+        rHData.m_labelColour = wxColour(0, 0, 255);
+        GetRenderer().DrawHeaderButton(pWin, rDC, r, iFlags,
+                                       rData.m_eSortIconType,
+                                       &rHData);
+    }
+    else
+    {
+        GetRenderer().DrawHeaderButton(pWin, rDC, r, iFlags,
+                                       rData.m_eSortIconType,
+                                       pData);
+    }
 }
 
 //--------------------- INTERFACE -----------------------------------//

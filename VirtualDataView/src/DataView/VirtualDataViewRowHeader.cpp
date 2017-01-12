@@ -109,6 +109,7 @@ bool wxVirtualDataViewRowHeader::GetItemData(size_t uiItemID, TItemData &rData) 
 {
     rData.m_sLabel = wxString::Format("%d", uiItemID);
     rData.m_iAlignment = wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL;
+    if (m_pOwner) rData.m_bIsFiltering = m_pOwner->IsFiltering();
     return(true);
 }
 
