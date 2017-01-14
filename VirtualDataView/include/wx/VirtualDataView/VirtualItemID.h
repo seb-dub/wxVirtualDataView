@@ -754,18 +754,58 @@ WX_VDV_INLINE bool wxVirtualItemID::operator>=(const wxVirtualItemID &rhs) const
 }
 
 //-------------------- HASH CODE ------------------------------------//
+//For 32 bit machines:
+const unsigned long s_uiFNVPrime = 16777619u;
+const unsigned long s_uiFNVOffsetBasis = 2166136261u;
+
+//For 64 bit machines:
+//const unsigned long s_uiFNVPrime = 1099511628211u;
+//const unsigned long s_uiFNVOffsetBasis = 14695981039346656037u;
+
+WX_VDV_INLINE unsigned long wxComputeHashSizeT(size_t uiValue, unsigned long uiCurrentHash)
+{
+    unsigned long uiHash = uiCurrentHash;
+    const size_t uiSize = sizeof(size_t);
+    size_t uiByte;
+    unsigned char *vBytes = (unsigned char *) &uiValue;
+    for(uiByte = 0; uiByte < uiSize; uiByte++)
+    {
+        uiHash *= s_uiFNVPrime;
+        uiHash ^= vBytes[uiByte];
+    }
+    return(uiHash);
+}
+
 /** Return a hash code
   * \return a hash code
   */
 WX_VDV_INLINE unsigned long wxVirtualItemID::GetHashCode(void) const
 {
-    unsigned long ulResult = 0;
+    //NOK: too many collisions
+//    unsigned long ulResult = 0;
+//
+//    const TStandardID &rID = m_Data.m_StandardID;
+//    ulResult = reinterpret_cast<size_t>(rID.m_ID.m_pData);
+//    ulResult ^= (rID.m_uiRow << 16);
+//    ulResult ^= (rID.m_uiCol << 16);
+//    //ulResult ^= reinterpret_cast<size_t>(m_pModel);
 
+    //OK (murmurhash3 avalanche trigger)
+//    unsigned long ulResult = 0;
+//
+//    const TStandardID &rID = m_Data.m_StandardID;
+//    ulResult = reinterpret_cast<size_t>(rID.m_ID.m_pData);
+//    ulResult = ulResult * 101 + rID.m_uiRow;
+//    ulResult = ulResult * 101 + rID.m_uiCol;
+//    ulResult = ulResult * 101 + m_uiChildIndex;
+
+    unsigned long ulResult = s_uiFNVOffsetBasis;
     const TStandardID &rID = m_Data.m_StandardID;
-    ulResult = reinterpret_cast<size_t>(rID.m_ID.m_pData);
-    ulResult ^= (rID.m_uiRow << 16);
-    ulResult ^= (rID.m_uiCol << 16);
-    //ulResult ^= reinterpret_cast<size_t>(m_pModel);
+    ulResult = wxComputeHashSizeT(reinterpret_cast<size_t>(rID.m_ID.m_pData), ulResult);
+    ulResult = wxComputeHashSizeT(rID.m_uiRow, ulResult);
+    ulResult = wxComputeHashSizeT(rID.m_uiCol, ulResult);
+    ulResult = wxComputeHashSizeT(m_uiChildIndex, ulResult);
+
     return(ulResult);
 }
 
