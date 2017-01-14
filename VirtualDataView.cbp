@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="VirtualDataView" />
+		<Option pch_mode="2" />
+		<Option compiler="gnu_gcc_compiler_64" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/VirtualDataView" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_64" />
+				<Compiler>
+					<Add option="-pg" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="--static" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/VirtualDataView" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_compiler_64" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="--static" />
+				</Linker>
+			</Target>
+			<Environment>
+				<Variable name="DEBUG" value="-d" />
+			</Environment>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-D__GNUWIN32__" />
+			<Add option="-D__WXMSW__" />
+			<Add option="-DUNICODE" />
+			<Add option="-DwxUSE_UNICODE" />
+			<Add option="-DwxDEBUG_LEVEL=0" />
+			<Add option="-DwxNO_EXCEPTIONS" />
+			<Add option="-DwxNO_RTTI" />
+			<Add option="-D_WIN64" />
+			<Add option="-DWIN64" />
+			<Add option="-D__USE_MINGW_ANSI_STDIO=1" />
+			<Add directory="$(#wx.lib)/mswu" />
+			<Add directory="$(#wx.include)" />
+			<Add directory="dataview/include" />
+			<Add directory="VirtualDataView/include" />
+			<Add directory="VirtualDataView/src" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="$(#wx.include)" />
+		</ResourceCompiler>
+		<Linker>
+			<Add library="wxmsw31u" />
+			<Add library="wxregexu" />
+			<Add library="wxpng" />
+			<Add library="wxzlib" />
+			<Add library="kernel32" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winspool" />
+			<Add library="comdlg32" />
+			<Add library="advapi32" />
+			<Add library="shell32" />
+			<Add library="ole32" />
+			<Add library="oleaut32" />
+			<Add library="comctl32" />
+			<Add library="wsock32" />
+			<Add library="netapi32" />
+			<Add library="odbc32" />
+			<Add library="winmm" />
+			<Add library="shlwapi" />
+			<Add library="version" />
+			<Add library="uuid" />
+			<Add directory="$(#wx.gcc_lib64)" />
+		</Linker>
+		<Unit filename="README.md" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttr.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttrProvider.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewDefaultCellAttr.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewItemAttr.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Columns/VirtualDataViewColumn.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Columns/VirtualDataViewColumnsList.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewItemCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewModelCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewBase.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewColHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewCornerHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewEvent.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewListCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewRowHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualTreePath.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewCheckBoxEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewChoiceEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewColourEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewDateEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewDateTimeEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewNumberEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewProgressEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewTextEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Editors/VirtualDataViewTimeEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FilterEditors/VirtualDataViewIFilterEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FilterEditors/VirtualDataViewStdFilterEditor.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataFilterModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterComboCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterComboPopup.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterPanel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterPopup.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFiltersList.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFloatFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewIntegerFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewNumericFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewStringFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewUIntegerFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Generic/ResizeableWindow.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Generic/ThemedSearchCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/ThemeHandleWin32.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderCtrlEvent.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderIRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderRearrangeDlg.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderRendererCustom.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderRendererGeneric.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderRendererNative.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Header/VirtualHeaderRendererWin32.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/LRUCache/LRUCache.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Mappers/VirtualDataViewCellMapper.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/ModelRenderer/VirtualIModelRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/ModelRenderer/VirtualListModelRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/ModelRenderer/VirtualTreeModelRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualFilteringDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualIArrayProxyDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualIDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualIListDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualIProxyDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Models/VirtualSortingDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewBitmapRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewBitmapTextRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewCheckBoxRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewColourRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewDateRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewDateTimeRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewNumberRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewProgressRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewTextRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Renderers/VirtualDataViewTimeRenderer.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/StateModels/VirtualDataViewItemState.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/StateModels/VirtualDefaultStateModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/StateModels/VirtualIStateModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/StateModels/VirtualListStateModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/Models/VirtualITableDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/Models/VirtualITableTreeDataModel.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableBase.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableColHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableCornerHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableCtrl.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableRowHeader.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/ArrayDefs.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/BitmapText.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/HashSetDefs.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/HashUtils.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/SizeTHashMap.hpp" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/VariantUtils.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Utilities/VirtualItemIDSearch.hpp" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/VirtualDataViewCellCoord.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/VirtualDataViewDefs.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/VirtualItemID.h" />
+		<Unit filename="VirtualDataView/src/CellAttrs/VirtualDataViewCellAttr.cpp" />
+		<Unit filename="VirtualDataView/src/CellAttrs/VirtualDataViewCellAttrProvider.cpp" />
+		<Unit filename="VirtualDataView/src/CellAttrs/VirtualDataViewDefaultCellAttr.cpp" />
+		<Unit filename="VirtualDataView/src/CellAttrs/VirtualDataViewItemAttr.cpp" />
+		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumn.cpp" />
+		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumnsList.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/DataViewModelCompat.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewBase.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewColHeader.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewCornerHeader.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewEvent.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewListCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewRowHeader.cpp" />
+		<Unit filename="VirtualDataView/src/DataView/VirtualTreePath.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewCheckBoxEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewChoiceEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewColourEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewDateEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewDateTimeEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewNumberEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewProgressEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewTextEditor.cpp" />
+		<Unit filename="VirtualDataView/src/Editors/VirtualDataViewTimeEditor.cpp" />
+		<Unit filename="VirtualDataView/src/FilterEditors/ComboboxState.cpp" />
+		<Unit filename="VirtualDataView/src/FilterEditors/ComboboxState.hpp" />
+		<Unit filename="VirtualDataView/src/FilterEditors/VirtualDataViewIFilterEditor.cpp" />
+		<Unit filename="VirtualDataView/src/FilterEditors/VirtualDataViewStdFilterEditor.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataFilterModel.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterComboCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterComboPopup.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterPanel.cpp" />
+		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterPopup.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFiltersList.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFloatFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewIntegerFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewNumericFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewStringFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewUIntegerFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Generic/ResizeableWindow.cpp" />
+		<Unit filename="VirtualDataView/src/Generic/ThemedSearchCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/Header/ThemeHandleWin32.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderCtrlEvent.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderIRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderRearrangeDlg.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderRendererCustom.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderRendererGeneric.cpp" />
+		<Unit filename="VirtualDataView/src/Header/VirtualHeaderRendererWin32.cpp" />
+		<Unit filename="VirtualDataView/src/Mappers/VirtualDataViewCellMapper.cpp" />
+		<Unit filename="VirtualDataView/src/ModelRenderer/VirtualIModelRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/ModelRenderer/VirtualListModelRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/ModelRenderer/VirtualTreeModelRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualFilteringDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualIArrayProxyDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualIDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualIListDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualIProxyDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Models/VirtualSortingDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewBitmapRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewBitmapTextRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewCheckBoxRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewColourRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewDateRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewDateTimeRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewNumberRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewProgressRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewTextRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/Renderers/VirtualDataViewTimeRenderer.cpp" />
+		<Unit filename="VirtualDataView/src/StateModels/VirtualDefaultStateModel.cpp" />
+		<Unit filename="VirtualDataView/src/StateModels/VirtualIStateModel.cpp" />
+		<Unit filename="VirtualDataView/src/StateModels/VirtualListStateModel.cpp" />
+		<Unit filename="VirtualDataView/src/Table/Models/VirtualITableDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Table/Models/VirtualITableTreeDataModel.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableBase.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableColHeader.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableCornerHeader.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableCtrl.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableHeader.cpp" />
+		<Unit filename="VirtualDataView/src/Table/VirtualDataTableRowHeader.cpp" />
+		<Unit filename="VirtualDataView/src/Types/ArrayDefs.cpp" />
+		<Unit filename="VirtualDataView/src/Types/BitmapText.cpp" />
+		<Unit filename="VirtualDataView/src/Types/VariantUtils.cpp" />
+		<Unit filename="VirtualDataView/src/VirtualItemID.cpp" />
+		<Unit filename="doc/topics/MainPage.h" />
+		<Unit filename="doxygen/doxyfile" />
+		<Unit filename="sample/TestDataModel.cpp" />
+		<Unit filename="sample/TestDataModel.h" />
+		<Unit filename="sample/TestListDataModel.cpp" />
+		<Unit filename="sample/TestListDataModel.h" />
+		<Unit filename="sample/TestScrolledWindow.cpp" />
+		<Unit filename="sample/TestScrolledWindow.h" />
+		<Unit filename="sample/TestTreeDataModel.cpp" />
+		<Unit filename="sample/TestTreeDataModel.h" />
+		<Unit filename="sample/amd64.manifest" />
+		<Unit filename="sample/dataview/mymodels.cpp" />
+		<Unit filename="sample/dataview/mymodels.h" />
+		<Unit filename="sample/dataview/null.xpm" />
+		<Unit filename="sample/dataview/wx_small.xpm" />
+		<Unit filename="sample/ia64.manifest" />
+		<Unit filename="sample/main.cpp" />
+		<Unit filename="sample/main.h" />
+		<Unit filename="sample/resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="sample/resources.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="sample/x86.manifest" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build extract_all="1" />
+				<doxyfile_warnings />
+				<doxyfile_output html_help="1" binary_toc="1" />
+				<doxyfile_dot class_diagrams="1" have_dot="1" />
+				<general />
+			</DoxyBlocks>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
