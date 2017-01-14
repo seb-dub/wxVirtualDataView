@@ -4,7 +4,7 @@
 #include <wx/VirtualDataView/Types/BitmapText.h>
 #include <wx/artprov.h>
 
-#define ITEMS_COUNT     50000
+#define INITIAL_ITEMS_COUNT     100000
 
 //-------------------- NESTED CLASS TID -----------------------------//
 TestListDataModel::TID::TID(size_t id, size_t uiField)
@@ -24,7 +24,8 @@ bool TestListDataModel::TID::operator<(const TestListDataModel::TID &rhs) const
 /** Default constructor
   */
 TestListDataModel::TestListDataModel(void)
-    : wxVirtualIListDataModel()
+    : wxVirtualIListDataModel(),
+      m_uiItemCount(INITIAL_ITEMS_COUNT)
 {
     m_attrEven.SetColour(wxColour(255, 0, 0));
     m_attrOdd.SetColour(wxColour(0, 0, 255));
@@ -39,39 +40,15 @@ TestListDataModel::~TestListDataModel(void)
 {
 }
 
-//------------ INTERFACE IMPLEMENTATION -----------------------------//
-/** Get amount of items
-  * \return the amount of items
-  */
-size_t TestListDataModel::GetItemCount(void)
-{
-    return(ITEMS_COUNT);
-}
-
+//-------------------- INTERNAL METHODS -----------------------------//
 /** Get the item data
   * \param uiItemID [input]: index of the item to query
   * \param uiField [input]: the field of the data to query
-  * \param eType [input] : the kind of data to get
   * \return the data of the item. Return invalid variant if no data is associated
   */
-wxVariant TestListDataModel::GetListItemData(size_t uiItemID,  size_t uiField, EDataType eType)
+WX_VDV_INLINE wxVariant TestListDataModel::DoGetItemData(size_t uiItemID,  size_t uiField)
 {
-    //tooltip
-    if (eType == WX_ITEM_TOOLTIP_DATA)
-    {
-        wxString sValue = wxString::Format("Tooltip ID=%d field=%d", uiItemID, uiField);
-        return(sValue);
-    }
-
-    //help
-    if (eType == WX_ITEM_HELP_DATA)
-    {
-        wxString sValue = wxString::Format("Help ID=%d field=%d", uiItemID, uiField);
-        return(sValue);
-    }
-
-    if (eType != WX_ITEM_MAIN_DATA) return(wxVariant());
-    if (uiItemID >= ITEMS_COUNT) return(wxVariant());
+    if (uiItemID >= m_uiItemCount) return(wxVariant());
 
     TMapOfValues::iterator it = m_MapOfValues.find(TID(uiItemID, uiField));
     if (it != m_MapOfValues.end())
@@ -135,6 +112,41 @@ wxVariant TestListDataModel::GetListItemData(size_t uiItemID,  size_t uiField, E
     return(wxVariant(sValue));
 }
 
+//------------ INTERFACE IMPLEMENTATION -----------------------------//
+/** Get amount of items
+  * \return the amount of items
+  */
+size_t TestListDataModel::GetItemCount(void)
+{
+    return(m_uiItemCount);
+}
+
+/** Get the item data
+  * \param uiItemID [input]: index of the item to query
+  * \param uiField [input]: the field of the data to query
+  * \param eType [input] : the kind of data to get
+  * \return the data of the item. Return invalid variant if no data is associated
+  */
+wxVariant TestListDataModel::GetListItemData(size_t uiItemID,  size_t uiField, EDataType eType)
+{
+    //tooltip
+    if (eType == WX_ITEM_TOOLTIP_DATA)
+    {
+        wxString sValue = wxString::Format("Tooltip ID=%d field=%d", uiItemID, uiField);
+        return(sValue);
+    }
+
+    //help
+    if (eType == WX_ITEM_HELP_DATA)
+    {
+        wxString sValue = wxString::Format("Help ID=%d field=%d", uiItemID, uiField);
+        return(sValue);
+    }
+
+    if (eType != WX_ITEM_MAIN_DATA) return(wxVariant());
+    return(DoGetItemData(uiItemID, uiField));
+}
+
 /** Get the item graphic attributes
   * \param uiItemID [input] : the index of the item to query
   * \param uiField [input]: the field index of the item to query
@@ -166,5 +178,46 @@ bool TestListDataModel::SetListItemData(size_t uiItemID, size_t uiField,
     m_MapOfValues.erase(tid);
     m_MapOfValues.insert(std::make_pair(tid, vValue));
     return(true);
+}
+
+/** Get all the values inside an array of variants
+  * \param rvVariants [output]: an array of variants. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void TestListDataModel::GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                     wxVirtualIStateModel *pStateModel)
+{
+    rvVariants.clear();
+
+    size_t i, uiCount;
+    uiCount = m_uiItemCount;
+    rvVariants.reserve(uiCount);
+    for(i=0;i<uiCount;i++)
+    {
+        wxVariant v = DoGetItemData(i, uiField);
+        rvVariants.push_back(v);
+    }
+}
+
+//--------------------- ITEM COUNT ----------------------------------//
+/** Set item new count
+  * \param uiNewCount [input]: the new item count
+  */
+void TestListDataModel::SetItemCount(size_t uiNewCount)
+{
+    m_uiItemCount = uiNewCount;
 }
 

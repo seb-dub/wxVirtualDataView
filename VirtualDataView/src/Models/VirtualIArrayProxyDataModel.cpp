@@ -105,12 +105,21 @@ const wxVirtualItemIDs& wxVirtualIArrayProxyDataModel::GetAllChildren(const wxVi
         return(m_CachedResult.GetValue(rIDParent));
     }
 
+    //special case
+    if (!m_pDataModel)
+    {
+        m_vChildren.clear();
+        return(m_vChildren);
+    }
+
     //get
     DoGetChildren(m_vChildren, rIDParent);
 
     //store in cache
-    if (m_vChildren.size() < m_uiMinAmountOfChildrenForCaching) return(m_vChildren);
-    if (m_vChildren.size() > m_uiMaxAmountOfChildrenForCaching) return(m_vChildren);
+    //size_t uiNbChildren = m_vChildren.size(); no, because for filtering models, the amount of children can be 0
+    size_t uiNbChildren = m_pDataModel->GetChildCount(rIDParent);
+    if (uiNbChildren < m_uiMinAmountOfChildrenForCaching) return(m_vChildren);
+    if (uiNbChildren > m_uiMaxAmountOfChildrenForCaching) return(m_vChildren);
     m_CachedResult.Insert(rIDParent, m_vChildren);
     return(m_vChildren);
 }

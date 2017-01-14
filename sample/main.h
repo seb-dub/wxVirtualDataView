@@ -15,6 +15,11 @@ class wxStreamToTextRedirector;
 class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl;
 class WXDLLIMPEXP_VDV wxVirtualDataViewFilterCtrl;
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    #include <wx/dataview.h>
+    #include "dataview/mymodels.h"
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 // ----------------------------------------------------------------------------
 // MyApp
 // ----------------------------------------------------------------------------
@@ -53,6 +58,12 @@ private:
     void        AddColumns(wxVirtualDataViewCtrl *pWindow);
     void        FillFilterItems(wxVirtualDataViewFilterCtrl *pFilterCtrl);
     void        OnPopupButton(wxCommandEvent &rEvent);
+
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    wxWindow*   CreateDataViewTree(wxWindow *pParent);
+    wxObjectDataPtr<MyMusicTreeModel>   m_music_model;
+    wxObjectDataPtr<MyListModel>        m_list_model;
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     wxDECLARE_EVENT_TABLE();
 };

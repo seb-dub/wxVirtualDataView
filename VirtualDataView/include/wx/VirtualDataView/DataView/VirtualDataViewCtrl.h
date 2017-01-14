@@ -29,6 +29,10 @@ class WXDLLIMPEXP_VDV wxVirtualHeaderCtrlEvent;
 class WXDLLIMPEXP_VDV wxVirtualDataViewEvent;
 class WXDLLIMPEXP_VDV wxVirtualDataViewFilter;
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+class WXDLLIMPEXP_VDV wxDataViewModel;
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 extern const char wxVirtualDataViewCtrlNameStr[];
 
 //styles
@@ -94,7 +98,10 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl : public wxSystemThemedControl<wxCon
         //data model
         wxVirtualIDataModel*    GetBaseDataModel(void) const;                   ///< \brief get the current data model used, without any proxies
         wxVirtualIDataModel*    GetDataModel(void) const;                       ///< \brief get the current data model used, with all proxies if any
-        virtual void            SetDataModel(wxVirtualIDataModel *pModel);      ///< \brief set the current data model. Current proxies will be kept
+        virtual void            SetDataModel(wxVirtualIDataModel *pModel);      ///< \brief set the current data model. Current proxies will be deleted
+        bool                    HasDataModelOwnership(void) const;              ///< \brief check if the control has ownership of the data model
+        void                    TakeDataModelOwnership(void);                   ///< \brief take ownership of the data model
+        void                    ReleaseDataModelOwnership(void);                ///< \brief release data model ownership
 
         //proxy data models
         void    AttachProxyModel(wxVirtualIProxyDataModel *pModel);             ///< \brief attach a proxy data model to the chain of models
@@ -105,10 +112,16 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl : public wxSystemThemedControl<wxCon
         //state model
         wxVirtualIStateModel* GetStateModel(void) const;                        ///< \brief get the state model
         void SetStateModel(wxVirtualIStateModel *pStateModel);                  ///< \brief set the state model
+        bool HasStateModelOwnership(void) const;                                ///< \brief check if the control has ownership of the state model
+        void TakeStateModelOwnership(void);                                     ///< \brief take ownership of the state model
+        void ReleaseStateModelOwnership(void);                                  ///< \brief release state model ownership
 
         //model renderer
         wxVirtualIModelRenderer* GetModelRenderer(void) const;                  ///< \brief get the model renderer
         void SetModelRenderer(wxVirtualIModelRenderer *pModelRenderer);         ///< \brief set the model renderer
+        bool HasModelRendererOwnership(void) const;                             ///< \brief check if the control has ownership of the model renderer
+        void TakeModelRendererOwnership(void);                                  ///< \brief take ownership of the model renderer
+        void ReleaseModelRendererOwnership(void);                               ///< \brief release model renderer ownership
 
         //callbacks for data change
         void OnModelItemCountChanged(void);                                     ///< \brief called by the client to notify that the data model has changed
@@ -411,6 +424,11 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl : public wxSystemThemedControl<wxCon
         bool StartResizingColumn(size_t uiCol, int iNewWidth);                  ///< \brief start resizing a column
         bool ResizingColumn(size_t uiCol, int iNewWidth);                       ///< \brief currently resizing a column
         bool ResizeColumn(size_t uiCol, int iNewWidth);                         ///< \brief finish resizing a column
+
+        //compatibility layer with wxDataViewCtrl
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+        virtual bool  AssociateModel(wxDataViewModel *pDataModel);              ///< \brief associate a new data model
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     protected:
         //data

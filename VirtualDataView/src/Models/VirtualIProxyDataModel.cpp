@@ -794,6 +794,7 @@ wxVirtualIDataModel::ECompareResult wxVirtualIProxyDataModel::Compare(const wxVi
   * \param rValue1    [input]: the value of the 1st item to compare
   * \param rID2       [input]: the 2nd item to compare
   * \param rValue2    [input]: the value of the 2nd item to compare
+  * \param uiField    [input]: the field to compare
   * \return WX_E_LESS_THAN    if rID1 < rID2
   *         WX_E_EQUAL        if rID1 == rID2
   *         WX_E_GREATER_THAN if rID1 > rID2
@@ -801,9 +802,10 @@ wxVirtualIDataModel::ECompareResult wxVirtualIProxyDataModel::Compare(const wxVi
 wxVirtualIDataModel::ECompareResult wxVirtualIProxyDataModel::Compare(const wxVirtualItemID &rID1,
                                                                       const wxVariant &rValue1,
                                                                       const wxVirtualItemID &rID2,
-                                                                      const wxVariant &rValue2)
+                                                                      const wxVariant &rValue2,
+                                                                      size_t uiField)
 {
-    if (m_pDataModel) return(m_pDataModel->Compare(rID1, rValue1, rID2, rValue2));
+    if (m_pDataModel) return(m_pDataModel->Compare(rID1, rValue1, rID2, rValue2, uiField));
     return(WX_E_EQUAL);
 }
 

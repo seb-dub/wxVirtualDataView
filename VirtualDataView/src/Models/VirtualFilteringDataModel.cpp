@@ -7,9 +7,7 @@
 
 #include <wx/VirtualDataView/Models/VirtualFilteringDataModel.h>
 #include <wx/VirtualDataView/Filters/VirtualDataViewFilter.h>
-#include <wx/VirtualDataView/Types/VariantUtils.h>
-#include <wx/VirtualDataView/Types/HashUtils.h>
-#include <wx/hashset.h>
+#include <wx/VirtualDataView/Types/HashSetDefs.h>
 
 //--------------- CONSTRUCTORS & DESTRUCTOR -------------------------//
 /** Default constructor
@@ -31,8 +29,7 @@ wxVirtualFilteringDataModel::~wxVirtualFilteringDataModel(void)
   */
 void wxVirtualFilteringDataModel::ClearFilters(void)
 {
-    m_vFilters.clear();
-    ClearCache();
+    if (m_vFilters.ClearFilters()) ClearCache();
 }
 
 /** Push filter
@@ -43,17 +40,10 @@ void wxVirtualFilteringDataModel::ClearFilters(void)
   */
 void wxVirtualFilteringDataModel::PushFilter(size_t uiField, wxVirtualDataViewFilter *pFilter)
 {
-    if (!pFilter)
+    if (m_vFilters.PushFilter(uiField, pFilter))
     {
-        PopFilter(uiField);
-        return;
+        ClearCache();
     }
-
-    TFilter t;
-    t.m_uiField = uiField;
-    t.m_pFilter = pFilter;
-    m_vFilters.push_back(t);
-    ClearCache();
 }
 
 /** Pop filter
@@ -61,31 +51,14 @@ void wxVirtualFilteringDataModel::PushFilter(size_t uiField, wxVirtualDataViewFi
   */
 void wxVirtualFilteringDataModel::PopFilter(size_t uiField)
 {
-    TFilters::iterator it    = m_vFilters.begin();
-    TFilters::iterator itEnd = m_vFilters.end();
-    while (it != itEnd)
-    {
-        TFilter &t = *it;
-        if (t.m_uiField == uiField)
-        {
-            ClearCache();
-            m_vFilters.erase(it);
-            it    = m_vFilters.begin();
-            itEnd = m_vFilters.end();
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    if (m_vFilters.PopFilter(uiField)) ClearCache();
 }
 
 /** Pop the last filter
   */
 void wxVirtualFilteringDataModel::PopFilter(void)
 {
-    m_vFilters.pop_back();
-    ClearCache();
+    if (m_vFilters.PopFilter()) ClearCache();
 }
 
 /** Check if a field is filtering
@@ -94,18 +67,7 @@ void wxVirtualFilteringDataModel::PopFilter(void)
   */
 bool wxVirtualFilteringDataModel::IsFiltering(size_t uiField) const
 {
-    TFilters::const_iterator it    = m_vFilters.begin();
-    TFilters::const_iterator itEnd = m_vFilters.end();
-    while (it != itEnd)
-    {
-        const TFilter &t = *it;
-        if ((t.m_uiField == uiField) && (t.m_pFilter))
-        {
-            if (t.m_pFilter->IsActive()) return(true);
-        }
-        ++it;
-    }
-    return(false);
+    return(m_vFilters.IsFiltering(uiField));
 }
 
 /** Check if at least one field is filtering
@@ -113,18 +75,7 @@ bool wxVirtualFilteringDataModel::IsFiltering(size_t uiField) const
   */
 bool wxVirtualFilteringDataModel::IsFiltering(void) const
 {
-    TFilters::const_iterator it    = m_vFilters.begin();
-    TFilters::const_iterator itEnd = m_vFilters.end();
-    while (it != itEnd)
-    {
-        const TFilter &t = *it;
-        if (t.m_pFilter)
-        {
-            if (t.m_pFilter->IsActive()) return(true);
-        }
-        ++it;
-    }
-    return(false);
+    return(m_vFilters.IsFiltering());
 }
 
 /** Get the filter for a field
@@ -133,21 +84,13 @@ bool wxVirtualFilteringDataModel::IsFiltering(void) const
   */
 wxVirtualDataViewFilter* wxVirtualFilteringDataModel::GetFilter(size_t uiField) const
 {
-    TFilters::const_iterator it    = m_vFilters.begin();
-    TFilters::const_iterator itEnd = m_vFilters.end();
-    while (it != itEnd)
-    {
-        const TFilter &t = *it;
-        if (t.m_uiField == uiField) return(t.m_pFilter);
-        ++it;
-    }
-    return(WX_VDV_NULL_PTR);
+    return(m_vFilters.GetFilter(uiField));
 }
 
 /** Get all the filters
   * \return a reference to all filters
   */
-wxVirtualFilteringDataModel::TFilters& wxVirtualFilteringDataModel::Filters(void)
+wxVirtualDataViewFiltersList& wxVirtualFilteringDataModel::Filters(void)
 {
     ClearCache();
     return(m_vFilters);
@@ -156,7 +99,7 @@ wxVirtualFilteringDataModel::TFilters& wxVirtualFilteringDataModel::Filters(void
 /** Get all the filters - const version
   * \return a const reference to all filters
   */
-const wxVirtualFilteringDataModel::TFilters& wxVirtualFilteringDataModel::Filters(void) const
+const wxVirtualDataViewFiltersList& wxVirtualFilteringDataModel::Filters(void) const
 {
     return(m_vFilters);
 }
@@ -179,39 +122,7 @@ void wxVirtualFilteringDataModel::DoGetChildren(wxVirtualItemIDs &vChildren, con
   */
 bool wxVirtualFilteringDataModel::IsAccepted(const wxVirtualItemID &rID)
 {
-    TFilters::const_iterator it     = m_vFilters.begin();
-    TFilters::const_iterator itEnd  = m_vFilters.end();
-    while (it != itEnd)
-    {
-        const TFilter &rFilter = *it;
-        if (rFilter.m_pFilter)
-        {
-            if (rFilter.m_pFilter->IsActive())
-            {
-                wxVariant vValue = m_pDataModel->GetItemData(rID, rFilter.m_uiField, WX_ITEM_MAIN_DATA);
-                if (!rFilter.m_pFilter->AcceptValue(vValue))
-                {
-                    bool bRecursive = rFilter.m_pFilter->IsRecursive();
-                    if (!bRecursive) return(false);
-
-                    //scan children
-                    wxVirtualItemIDs vChildren;
-                    m_pDataModel->GetAllChildren(vChildren, rID);
-                    size_t uiNbChildren = vChildren.size();
-                    size_t uiChild;
-                    for(uiChild = 0; uiChild < uiNbChildren; uiChild++)
-                    {
-                        wxVirtualItemID &rIDChild = vChildren[uiChild];
-                        if (IsAccepted(rIDChild)) return(true);
-                    }
-                    return(false);
-                }
-            }
-        }
-
-        ++it;
-    }
-    return(true);
+    return(m_vFilters.IsAccepted(rID, m_pDataModel));
 }
 
 /** Check if an item is accepted, ignoring filter recursivity
@@ -220,23 +131,7 @@ bool wxVirtualFilteringDataModel::IsAccepted(const wxVirtualItemID &rID)
   */
 bool wxVirtualFilteringDataModel::IsAcceptedNonRecursive(const wxVirtualItemID &rID)
 {
-    TFilters::const_iterator it     = m_vFilters.begin();
-    TFilters::const_iterator itEnd  = m_vFilters.end();
-    while (it != itEnd)
-    {
-        const TFilter &rFilter = *it;
-        if (rFilter.m_pFilter)
-        {
-            if (rFilter.m_pFilter->IsActive())
-            {
-                wxVariant vValue = m_pDataModel->GetItemData(rID, rFilter.m_uiField, WX_ITEM_MAIN_DATA);
-                if (!rFilter.m_pFilter->AcceptValue(vValue)) return(false);
-            }
-        }
-
-        ++it;
-    }
-    return(true);
+    return(m_vFilters.IsAcceptedNonRecursive(rID, m_pDataModel));
 }
 
 /** Apply filters to a list of IDs
@@ -246,35 +141,10 @@ bool wxVirtualFilteringDataModel::IsAcceptedNonRecursive(const wxVirtualItemID &
 void wxVirtualFilteringDataModel::ApplyFilters(wxVirtualItemIDs &vFiltered,
                                                const wxVirtualItemIDs &vUnfiltered)
 {
-    vFiltered.clear();
-
-    size_t uiChildIndex = 0;
-    wxVirtualItemIDs::const_iterator it     = vUnfiltered.begin();
-    wxVirtualItemIDs::const_iterator itEnd  = vUnfiltered.end();
-    while(it != itEnd)
-    {
-        const wxVirtualItemID &rID = *it;
-        if (IsAccepted(rID))
-        {
-            vFiltered.push_back(rID);
-            vFiltered[uiChildIndex].SetChildIndex(uiChildIndex);
-            uiChildIndex++;
-        }
-        ++it;
-    }
+    m_vFilters.FilterItems(vFiltered, vUnfiltered, m_pDataModel);
 }
 
 //---------------------- HELPER METHOD FOR GetAllValues -------------//
-//hash set containing strings, doubles, ints, ...
-WX_DECLARE_HASH_SET(wxString, wxStringHash, wxStringEqual, TSetOfStrings);
-WX_DECLARE_HASH_SET(double, wxDoubleHash, wxDoubleEqual, TSetOfDoubles);
-WX_DECLARE_HASH_SET(long, wxIntegerHash, wxIntegerEqual, TSetOfLongs);
-WX_DECLARE_HASH_SET(int, wxIntegerHash, wxIntegerEqual, TSetOfBools);
-WX_DECLARE_HASH_SET(unsigned long, wxIntegerHash, wxIntegerEqual, TSetOfULongs);
-WX_DECLARE_HASH_SET(wxLongLong, wxLongLongHash, wxLongLongEqual, TSetOfLongLongs);
-WX_DECLARE_HASH_SET(wxULongLong, wxLongLongHash, wxLongLongEqual, TSetOfULongLongs);
-WX_DECLARE_HASH_SET(wxVariant, wxVariantHash, wxVariantEqual, TSetOfVariants);
-
 /** Helper method for getting all the values
   * the main difference is that we want the filtered values, with all filters
   * actives EXCEPT THE ONE in the CURRENT FIELD.

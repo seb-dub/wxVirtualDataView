@@ -26,6 +26,14 @@
 #include <wx/VirtualDataView/FilterEditors/VirtualDataViewIFilterEditor.h>
 #include <wx/VirtualDataView/Filters/VirtualDataViewFilter.h>
 
+//includes for compatibility layer
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    #include <wx/VirtualDataView/Compatibility/DataViewModelCompat.h>
+#include <wx/VirtualDataView/ModelRenderer/VirtualTreeModelRenderer.h>
+#include <wx/VirtualDataView/ModelRenderer/VirtualListModelRenderer.h>
+    #include <wx/dataview.h>
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 #include <wx/sizer.h>
 #include <wx/dcclient.h>
 #include <wx/dcbuffer.h>
@@ -398,13 +406,47 @@ wxVirtualIDataModel* wxVirtualDataViewCtrl::GetDataModel(void) const
     return(m_pClientArea->GetDataModel());
 }
 
-/** Set the current data model. Current proxies will be kept
+/** Set the current data model. Current proxies will be deleted
+  * If sorting and/or filtering was applied, it will be reapplied (proxy models recreated)
   * \param pModel [input] : the new data model to associate with the control.
   *                         Ownership is taken: it must have been allocated with "new"
   */
 void wxVirtualDataViewCtrl::SetDataModel(wxVirtualIDataModel *pModel)
 {
-    if (m_pClientArea) m_pClientArea->SetDataModel(pModel);
+    if (m_pClientArea)
+    {
+        m_pClientArea->SetDataModel(pModel);
+        m_pFilteringModel = WX_VDV_NULL_PTR;
+        m_pSortingModel = WX_VDV_NULL_PTR;
+        ApplyFilters(); //reapply filters
+        SortItems(); //reapply sort items
+    }
+}
+
+/** Check if the control has ownership of the data model
+  * \return true if the data model is owned by the control. If so, the data model
+  *         is deleted by the destructor (using "delete")
+  *         false if the data model is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewCtrl::HasDataModelOwnership(void) const
+{
+    if (m_pClientArea) return(m_pClientArea->HasDataModelOwnership());
+    return(false);
+}
+
+/** Take ownership of the data model
+  * The data model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewCtrl::TakeDataModelOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->TakeDataModelOwnership();
+}
+
+/** Release data model ownership
+  */
+void wxVirtualDataViewCtrl::ReleaseDataModelOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->ReleaseDataModelOwnership();
 }
 
 //--------------------- PROXY DATA MODELS ---------------------------//
@@ -473,6 +515,32 @@ void wxVirtualDataViewCtrl::SetStateModel(wxVirtualIStateModel *pStateModel)
     if (m_pClientArea) m_pClientArea->SetStateModel(pStateModel);
 }
 
+/** Check if the control has ownership of the state model
+  * \return true if the state model is owned by the control. If so, the state model
+  *         is deleted by the destructor (using "delete")
+  *         false if the state model is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewCtrl::HasStateModelOwnership(void) const
+{
+    if (m_pClientArea) return(m_pClientArea->HasStateModelOwnership());
+    return(false);
+}
+
+/** Take ownership of the state model
+  * The state model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewCtrl::TakeStateModelOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->TakeStateModelOwnership();
+}
+
+/** Release state model ownership
+  */
+void wxVirtualDataViewCtrl::ReleaseStateModelOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->ReleaseStateModelOwnership();
+}
+
 //---------------------- MODEL RENDERER -----------------------------//
 /** Get the model renderer
   * \return the model renderer
@@ -496,6 +564,32 @@ void wxVirtualDataViewCtrl::SetModelRenderer(wxVirtualIModelRenderer *pModelRend
         pModelRenderer->SetClientWindow(m_pClientArea);
         pModelRenderer->SetScrollerWindow(this);
     }
+}
+
+/** Check if the control has ownership of the model renderer
+  * \return true if the model renderer is owned by the control. If so, the model renderer
+  *         is deleted by the destructor (using "delete")
+  *         false if the model renderer is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewCtrl::HasModelRendererOwnership(void) const
+{
+    if (m_pClientArea) return(m_pClientArea->HasModelRendererOwnership());
+    return(false);
+}
+
+/** Take ownership of the model renderer
+  * The model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewCtrl::TakeModelRendererOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->TakeModelRendererOwnership();
+}
+
+/** Release model renderer ownership
+  */
+void wxVirtualDataViewCtrl::ReleaseModelRendererOwnership(void)
+{
+    if (m_pClientArea) m_pClientArea->ReleaseModelRendererOwnership();
 }
 
 //---------------------- CALLBACKS FOR DATA CHANGE ------------------//
@@ -3530,3 +3624,29 @@ bool wxVirtualDataViewCtrl::IsFiltering(void)
     }
     return(false);
 }
+
+//----------------- COMPATIBILITY LAYER WITH WXDATAVIEWCTRL ---------//
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+/** Associate a new data model
+  * \param pDataModel [input]: the data model to associate
+  * \return true on success, false on failure
+  */
+bool wxVirtualDataViewCtrl::AssociateModel(wxDataViewModel *pDataModel)
+{
+    if (!pDataModel) return(false);
+    wxDataViewModelCompat *pCompatModel = new wxDataViewModelCompat(pDataModel);
+    SetDataModel(pCompatModel);
+
+    if (pDataModel->IsListModel())
+    {
+        SetModelRenderer(new wxVirtualListModelRenderer(m_pClientArea, this));
+    }
+    else
+    {
+        SetModelRenderer(new wxVirtualTreeModelRenderer(m_pClientArea, this));
+    }
+    return(true);
+}
+
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+

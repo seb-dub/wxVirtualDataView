@@ -187,7 +187,8 @@ class WXDLLIMPEXP_VDV wxVirtualIProxyDataModel : public wxVirtualIDataModel
         virtual ECompareResult  Compare(const wxVirtualItemID &rID1,
                                         const wxVariant &rValue1,
                                         const wxVirtualItemID &rID2,
-                                        const wxVariant &rValue2);                          ///< \brief compare 2 items values
+                                        const wxVariant &rValue2,
+                                        size_t uiField);                                    ///< \brief compare 2 items values
 
         //proxy data model
         virtual bool IsProxyDataModel(void) const;                                          ///< \brief return true if the model is a proxy data model

@@ -47,8 +47,8 @@ TestTreeDataModel::~TestTreeDataModel(void)
 //  level 3 : each level 2 item has NB_ITEMS_LEVEL_3 items. Index starting at 1. Stored in column ID
 
 #define NB_ITEMS_LEVEL_1        10
-#define NB_ITEMS_LEVEL_2        10
-#define NB_ITEMS_LEVEL_3        10
+#define NB_ITEMS_LEVEL_2        1000
+#define NB_ITEMS_LEVEL_3        1000
 
 /** Get the parent item ID
   * \param rID [input]: the child item

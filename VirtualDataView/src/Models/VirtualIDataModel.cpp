@@ -9,11 +9,9 @@
 #include <wx/VirtualDataView/Models/VirtualIProxyDataModel.h>
 #include <wx/VirtualDataView/StateModels/VirtualIStateModel.h>
 #include <wx/VirtualDataView/Types/BitmapText.h>
-#include <wx/VirtualDataView/Types/VariantUtils.h>
-#include <wx/VirtualDataView/Types/HashUtils.h>
+#include <wx/VirtualDataView/Types/HashSetDefs.h>
 #include <wx/stack.h>
 #include <wx/regex.h>
-#include <wx/hashset.h>
 
 #define SPEED_OPTIMIZATION_1     1
 #define SPEED_OPTIMIZATION_2     1
@@ -1341,6 +1339,7 @@ wxVirtualIDataModel::ECompareResult wxVirtualIDataModel::Compare(const wxVirtual
   * \param rValue1    [input]: the value of the 1st item to compare
   * \param rID2       [input]: the 2nd item to compare
   * \param rValue2    [input]: the value of the 2nd item to compare
+  * \param uiField    [input]: the field to compare
   * \return WX_E_LESS_THAN    if rID1 < rID2
   *         WX_E_EQUAL        if rID1 == rID2
   *         WX_E_GREATER_THAN if rID1 > rID2
@@ -1348,25 +1347,14 @@ wxVirtualIDataModel::ECompareResult wxVirtualIDataModel::Compare(const wxVirtual
 wxVirtualIDataModel::ECompareResult wxVirtualIDataModel::Compare(const wxVirtualItemID &rID1,
                                                                  const wxVariant &rValue1,
                                                                  const wxVirtualItemID &rID2,
-                                                                 const wxVariant &rValue2)
+                                                                 const wxVariant &rValue2,
+                                                                 size_t uiField)
 {
     int iRes = CompareItems(rID1, rValue1, rID2, rValue2);
     return((ECompareResult) iRes);
 }
 
-
 //--------------------- FILTERING HELPERS ---------------------------//
-//hash set containing strings, doubles
-WX_DECLARE_HASH_SET(wxString, wxStringHash, wxStringEqual, TSetOfStrings);
-WX_DECLARE_HASH_SET(double, wxDoubleHash, wxDoubleEqual, TSetOfDoubles);
-WX_DECLARE_HASH_SET(long, wxIntegerHash, wxIntegerEqual, TSetOfLongs);
-WX_DECLARE_HASH_SET(int, wxIntegerHash, wxIntegerEqual, TSetOfBools);
-WX_DECLARE_HASH_SET(unsigned long, wxIntegerHash, wxIntegerEqual, TSetOfULongs);
-WX_DECLARE_HASH_SET(wxLongLong, wxLongLongHash, wxLongLongEqual, TSetOfLongLongs);
-WX_DECLARE_HASH_SET(wxULongLong, wxLongLongHash, wxLongLongEqual, TSetOfULongLongs);
-WX_DECLARE_HASH_SET(wxVariant, wxVariantHash, wxVariantEqual, TSetOfVariants);
-
-
 template<typename TSet, typename T>
 WX_VDV_INLINE void AddVariantToSet(TSet &rSet, const wxVariant &v)
 {
@@ -1798,7 +1786,9 @@ wxVirtualIDataModel* wxVirtualIDataModel::GetParentModel(void)
 }
 
 /** Set parent model
-  * \param pParentModel [input]: the new parent model. Ownership NOT taken
+  * \param pParentModel [input]: the new parent model.
+  *                              IncRef called on pParentModel
+  *                              DecRef called on previous parent model
   */
 void wxVirtualIDataModel::SetParentModel(wxVirtualIDataModel *pParentModel)
 {

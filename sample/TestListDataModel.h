@@ -27,6 +27,11 @@ class TestListDataModel : public wxVirtualIListDataModel
                                                             size_t uiField,
                                               const wxVirtualDataViewItemState &rState);    ///< \brief get the item graphic attributes
 
+        virtual void GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of variants
+
+        //item count
+        void SetItemCount(size_t uiNewCount);                                               ///< \brief set item new count
     private:
         //structs
         struct TID
@@ -45,5 +50,9 @@ class TestListDataModel : public wxVirtualIListDataModel
         wxVirtualDataViewItemAttr   m_attrEven;
         wxBitmap                    m_bmp1;
         wxBitmap                    m_bmp2;
+        size_t                      m_uiItemCount;
+
+        //methods
+        wxVariant DoGetItemData(size_t uiItemID,  size_t uiField);                  ///< \brief get item data
 };
 

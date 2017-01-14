@@ -309,7 +309,8 @@ class WXDLLIMPEXP_VDV wxVirtualIDataModel
         virtual ECompareResult  Compare(const wxVirtualItemID &rID1,
                                         const wxVariant &rValue1,
                                         const wxVirtualItemID &rID2,
-                                        const wxVariant &rValue2);                          ///< \brief compare 2 items values
+                                        const wxVariant &rValue2,
+                                        size_t uiField);                                    ///< \brief compare 2 items values
 
         //filtering - get all values as string
         virtual void GetAllValues(wxArrayString &rvStrings, size_t uiField,

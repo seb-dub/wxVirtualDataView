@@ -91,6 +91,8 @@
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/CellAttrs/VirtualDataViewItemAttr.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Columns/VirtualDataViewColumn.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Columns/VirtualDataViewColumnsList.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewItemCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewModelCompat.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewBase.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewColHeader.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewCornerHeader.h" />
@@ -118,6 +120,7 @@
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterPanel.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/FiltersUI/VirtualDataViewFilterPopup.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFilter.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFiltersList.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewFloatFilter.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewIntegerFilter.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Filters/VirtualDataViewNumericFilter.h" />
@@ -170,6 +173,7 @@
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Table/VirtualDataTableRowHeader.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/ArrayDefs.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/BitmapText.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/HashSetDefs.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/HashUtils.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/SizeTHashMap.hpp" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Types/VariantUtils.h" />
@@ -183,6 +187,7 @@
 		<Unit filename="VirtualDataView/src/CellAttrs/VirtualDataViewItemAttr.cpp" />
 		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumn.cpp" />
 		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumnsList.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/DataViewModelCompat.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewBase.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewColHeader.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewCornerHeader.cpp" />
@@ -212,6 +217,7 @@
 		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterPanel.cpp" />
 		<Unit filename="VirtualDataView/src/FiltersUI/VirtualDataViewFilterPopup.cpp" />
 		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFilter.cpp" />
+		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFiltersList.cpp" />
 		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewFloatFilter.cpp" />
 		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewIntegerFilter.cpp" />
 		<Unit filename="VirtualDataView/src/Filters/VirtualDataViewNumericFilter.cpp" />
@@ -274,6 +280,10 @@
 		<Unit filename="sample/TestTreeDataModel.cpp" />
 		<Unit filename="sample/TestTreeDataModel.h" />
 		<Unit filename="sample/amd64.manifest" />
+		<Unit filename="sample/dataview/mymodels.cpp" />
+		<Unit filename="sample/dataview/mymodels.h" />
+		<Unit filename="sample/dataview/null.xpm" />
+		<Unit filename="sample/dataview/wx_small.xpm" />
 		<Unit filename="sample/ia64.manifest" />
 		<Unit filename="sample/main.cpp" />
 		<Unit filename="sample/main.h" />

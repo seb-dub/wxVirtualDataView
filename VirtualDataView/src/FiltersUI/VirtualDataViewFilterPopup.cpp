@@ -91,7 +91,7 @@ void wxVirtualDataViewFilterPopup::BuildContents(void)
     m_pFilterPanel->GetButtonCancel()->Bind(wxEVT_BUTTON, &wxVirtualDataViewFilterPopup::OnButtonCancel, this);
 
     wxWindow* pTopLevelWin = wxGetTopLevelParent(GetParent());
-    if (pTopLevelWin) pTopLevelWin->Bind(wxEVT_ICONIZE, wxVirtualDataViewFilterPopup::OnIconize, this);
+    if (pTopLevelWin) pTopLevelWin->Bind(wxEVT_ICONIZE, &wxVirtualDataViewFilterPopup::OnIconize, this);
 }
 
 //----------------------- MAIN COMPONENTS ---------------------------//

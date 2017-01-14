@@ -327,7 +327,7 @@ class wxComparisonFunctor
 {
     public:
         wxComparisonFunctor(wxVirtualIDataModel *pDataModel, size_t uiSize,
-                            wxVector<wxVirtualSortingDataModel::ESorting> &vSortOrder)
+                            wxVector<wxVirtualSortingDataModel::TSort> &vSortOrder)
             : m_pDataModel(pDataModel),
               m_uiSize(uiSize),
               m_SortOrder(vSortOrder)
@@ -341,16 +341,19 @@ class wxComparisonFunctor
             for(i=0;i<uiSize;i++)
             {
                 int iRes = wxVirtualSortingDataModel::WX_E_EQUAL;
-                switch(m_SortOrder[i])
+                const wxVirtualSortingDataModel::TSort &rSort = m_SortOrder[i];
+                switch(rSort.m_eSortOrder)
                 {
                     case wxVirtualSortingDataModel::WX_E_SORT_ASCENDING  :
                         iRes = m_pDataModel->Compare(v1.m_id, v1.m_Variant[i],
-                                                     v2.m_id, v2.m_Variant[i]);
+                                                     v2.m_id, v2.m_Variant[i],
+                                                     rSort.m_uiSortedField);
                         break;
 
                     case wxVirtualSortingDataModel::WX_E_SORT_DESCENDING :
                         iRes = m_pDataModel->Compare(v2.m_id, v2.m_Variant[i],
-                                                     v1.m_id, v1.m_Variant[i]);
+                                                     v1.m_id, v1.m_Variant[i],
+                                                     rSort.m_uiSortedField);
                         break;
 
                     case wxVirtualSortingDataModel::WX_E_SORT_NOT_SORTING:
@@ -373,7 +376,7 @@ class wxComparisonFunctor
         //data
         wxVirtualIDataModel*                            m_pDataModel;       //BASE data model
         size_t                                          m_uiSize;           //amount of fields
-        wxVector<wxVirtualSortingDataModel::ESorting>   m_SortOrder;        //sort order
+        wxVector<wxVirtualSortingDataModel::TSort>      m_SortOrder;        //sort order
 };
 
 /** Fast sorting of the items
@@ -415,13 +418,13 @@ void wxVirtualSortingDataModel::FastSort(wxVirtualItemIDs &vIDs)
     }
 
     //initialize the comparison functor
-    wxVector<wxVirtualSortingDataModel::ESorting> vSortOrder;
+    wxVector<wxVirtualSortingDataModel::TSort> vSortOrder;
     TSortFilters::const_iterator it    = m_vSortFilters.begin();
     TSortFilters::const_iterator itEnd = m_vSortFilters.end();
     while(it != itEnd)
     {
         const TSort &rSort = *it;
-        vSortOrder.push_back(rSort.m_eSortOrder);
+        vSortOrder.push_back(rSort);
         ++it;
     }
 

@@ -10,6 +10,7 @@
 #define WX_VIRTUAL_FILTERING_DATA_MODEL_H_
 
 #include <wx/VirtualDataView/Models/VirtualIArrayProxyDataModel.h>
+#include <wx/VirtualDataView/Filters/VirtualDataViewFiltersList.h>
 
 class WXDLLIMPEXP_VDV wxVirtualDataViewFilter;
 
@@ -22,26 +23,17 @@ class WXDLLIMPEXP_VDV wxVirtualFilteringDataModel : public wxVirtualIArrayProxyD
         wxVirtualFilteringDataModel(void);                                                  ///< \brief default constructor
         virtual ~wxVirtualFilteringDataModel(void);                                         ///< \brief destructor
 
-        /// \struct TFilter : the filtering information for a field
-        struct TFilter
-        {
-            size_t                      m_uiField;                                          ///< \brief the filtered field
-            wxVirtualDataViewFilter*    m_pFilter;                                          ///< \brief the filter for this field
-        };
-
-        typedef std::vector<TFilter>  TFilters;                                             ///< \brief array of filters
-
         //filters
-        void                        ClearFilters(void);                                     ///< \brief clear all filter
-        void                        PushFilter(size_t uiField,
-                                               wxVirtualDataViewFilter *pFilter);           ///< \brief push filter
-        void                        PopFilter(size_t uiField);                              ///< \brief pop filter
-        void                        PopFilter(void);                                        ///< \brief pop the last filter
-        bool                        IsFiltering(size_t uiField) const;                      ///< \brief check if a field is filtering
-        bool                        IsFiltering(void) const;                                ///< \brief check if at least one field is filtering
-        wxVirtualDataViewFilter*    GetFilter(size_t uiField) const;                        ///< \brief get the filter for a field
-        TFilters&                   Filters(void);                                          ///< \brief get all the filters
-        const TFilters&             Filters(void) const;                                    ///< \brief get all the filters - const version
+        void                                ClearFilters(void);                             ///< \brief clear all filter
+        void                                PushFilter(size_t uiField,
+                                                        wxVirtualDataViewFilter *pFilter);  ///< \brief push filter
+        void                                PopFilter(size_t uiField);                      ///< \brief pop filter
+        void                                PopFilter(void);                                ///< \brief pop the last filter
+        bool                                IsFiltering(size_t uiField) const;              ///< \brief check if a field is filtering
+        bool                                IsFiltering(void) const;                        ///< \brief check if at least one field is filtering
+        wxVirtualDataViewFilter*            GetFilter(size_t uiField) const;                ///< \brief get the filter for a field
+        wxVirtualDataViewFiltersList&       Filters(void);                                  ///< \brief get all the filters
+        const wxVirtualDataViewFiltersList& Filters(void) const;                            ///< \brief get all the filters - const version
 
         //interface reimplementation from wxVirtualIDataModel
         //filtering - get all values as string
@@ -84,9 +76,9 @@ class WXDLLIMPEXP_VDV wxVirtualFilteringDataModel : public wxVirtualIArrayProxyD
 
     protected:
         //data
-        TFilters                    m_vFilters;                                             ///< \brief list of filters
-        wxVirtualItemIDs            m_vTempArray;                                           ///< \brief temp array
-        bool                        m_bApplyFiltersForGetAllValues;                         ///< \brief if true, current filters are applied when calling GetAllValues
+        wxVirtualDataViewFiltersList    m_vFilters;                                         ///< \brief list of filters
+        wxVirtualItemIDs                m_vTempArray;                                       ///< \brief temp array
+        bool                            m_bApplyFiltersForGetAllValues;                     ///< \brief if true, current filters are applied when calling GetAllValues
 
         //interface
         virtual void    DoGetChildren(wxVirtualItemIDs &vChildren,

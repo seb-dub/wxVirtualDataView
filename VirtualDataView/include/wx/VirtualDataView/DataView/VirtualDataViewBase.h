@@ -61,7 +61,10 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewBase : public wxSystemThemedControl<wxCon
         //data model
         wxVirtualIDataModel*    GetBaseDataModel(void) const;               ///< \brief get the current data model used, without any proxies
         wxVirtualIDataModel*    GetDataModel(void) const;                   ///< \brief get the current data model used, with all proxies if any
-        void                    SetDataModel(wxVirtualIDataModel *pModel);  ///< \brief set the current data model. Current proxies will be kept
+        void                    SetDataModel(wxVirtualIDataModel *pModel);  ///< \brief set the current data model. Current proxies will be deleted
+        bool                    HasDataModelOwnership(void) const;          ///< \brief check if the control has ownership of the data model
+        void                    TakeDataModelOwnership(void);               ///< \brief take ownership of the data model
+        void                    ReleaseDataModelOwnership(void);            ///< \brief release data model ownership
 
         //proxy data models
         void    AttachProxyModel(wxVirtualIProxyDataModel *pModel);         ///< \brief attach a proxy data model to the chain of models
@@ -72,10 +75,16 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewBase : public wxSystemThemedControl<wxCon
         //state model
         wxVirtualIStateModel* GetStateModel(void) const;                    ///< \brief get the state model
         void SetStateModel(wxVirtualIStateModel *pStateModel);              ///< \brief set the state model
+        bool HasStateModelOwnership(void) const;                            ///< \brief check if the control has ownership of the state model
+        void TakeStateModelOwnership(void);                                 ///< \brief take ownership of the state model
+        void ReleaseStateModelOwnership(void);                              ///< \brief release state model ownership
 
         //model renderer
         wxVirtualIModelRenderer* GetModelRenderer(void) const;              ///< \brief get the model renderer
         void SetModelRenderer(wxVirtualIModelRenderer *pModelRenderer);     ///< \brief set the model renderer
+        bool HasModelRendererOwnership(void) const;                         ///< \brief check if the control has ownership of the model renderer
+        void TakeModelRendererOwnership(void);                              ///< \brief take ownership of the model renderer
+        void ReleaseModelRendererOwnership(void);                           ///< \brief release model renderer ownership
 
         //repaint
         void UpdateDisplay(void);                                           ///< \brief update the display
@@ -158,12 +167,18 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewBase : public wxSystemThemedControl<wxCon
         wxVirtualIDataModel*                m_pDataModel;                   ///< \brief the data model, with proxies
         wxVirtualIStateModel*               m_pStateModel;                  ///< \brief the state model
         wxVirtualIModelRenderer*            m_pModelRenderer;               ///< \brief the model renderer
+        bool                                m_bOwnDataModel;                ///< \brief true if the control owns the data model
+        bool                                m_bOwnStateModel;               ///< \brief true if the control owns the state model
+        bool                                m_bOwnModelRenderer;            ///< \brief true if the control owns the model renderer
 
         //methods
         void Init(wxVirtualIDataModel *pDataModel,
                   wxVirtualIStateModel *pStateModel,
                   wxVirtualIModelRenderer *pModelRenderer);                 ///< \brief common part of all constructors
         void Release(void);                                                 ///< \brief release internal resources
+        void ReleaseDataModel(void);                                        ///< \brief release the data model
+        void ReleaseStateModel(void);                                       ///< \brief release the state model
+        void ReleaseModelRenderer(void);                                    ///< \brief release the model renderer
 
         //interface: event handlers
         virtual void OnPaintEvent(wxPaintEvent &rEvent);                    ///< \brief paint handler

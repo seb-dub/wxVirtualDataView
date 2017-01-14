@@ -10,6 +10,7 @@
 #define _VIRTUAL_DATA_VIEW_STRING_FILTER_H_
 
 #include <wx/VirtualDataView/Filters/VirtualDataViewFilter.h>
+#include <wx/VirtualDataView/Types/HashSetDefs.h>
 #include <wx/string.h>
 #include <wx/regex.h>
 #include <wx/variant.h>
@@ -59,6 +60,7 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewStringFilter : public wxVirtualDataViewFi
         wxRegEx         m_sCompiledRegEx;                                       ///< \brief compiled regular expression
         wxArrayString   m_sSearchedString;                                      ///< \brief searched string in upper case if needed
         wxVariant       m_vReferenceValue;                                      ///< \brief reference value
+        TSetOfStrings   m_SetOfStrings;                                         ///< \brief set of strings
 
         //methods
         void CopyString(const wxVirtualDataViewStringFilter &rhs);              ///< \brief copy object

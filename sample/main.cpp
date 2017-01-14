@@ -19,6 +19,7 @@
 #include <wx/VirtualDataView/Editors/VirtualDataViewChoiceEditor.h>
 
 
+
 #include <wx/splitter.h>
 #include <wx/notebook.h>
 #include <wx/filedlg.h>
@@ -92,6 +93,10 @@ void MyFrame::BuildContent(void)
     AddNotebookPage(CreateComboFilterUI(pNotebook), "Filter combo UI");
     AddNotebookPage(CreateTableView(pNotebook), "Table");
     AddNotebookPage(CreateScrolledWindow(pNotebook), "ScrollTest");
+
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    AddNotebookPage(CreateDataViewTree(pNotebook), "DataView Compat Layer: tree");
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     //log window
     wxWindow *pLog = CreateLogWindow();
@@ -364,4 +369,43 @@ void MyFrame::OnPopupButton(wxCommandEvent &rEvent)
     pPopupWin->SetFocus();
 }
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+wxWindow* MyFrame::CreateDataViewTree(wxWindow *pParent)
+{
+    int iStyle = 0;
+    wxVirtualDataViewCtrl *pTree = new wxVirtualDataViewCtrl(pParent, wxID_ANY, wxDefaultPosition, wxDefaultSize, iStyle);
+    //pList->HideRowHeader();
 
+    //add columns
+    wxVirtualDataViewColumn oCol1("title", 0);
+    oCol1.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    oCol1.SetFromType();
+    oCol1.SetWidth(200);
+    oCol1.SetMinWidth(50);
+    oCol1.SetEditable();
+    pTree->Columns().AppendColumn(oCol1);
+
+    wxVirtualDataViewColumn oCol2("artist", 0);
+    oCol2.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    oCol2.SetFromType();
+    oCol2.SetWidth(200);
+    oCol2.SetMinWidth(50);
+    oCol2.SetEditable();
+    pTree->Columns().AppendColumn(oCol2);
+
+    wxVirtualDataViewColumn oCol3("year", 0);
+    oCol3.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    oCol3.SetFromType();
+    oCol3.SetWidth(200);
+    oCol3.SetMinWidth(50);
+    oCol3.SetEditable();
+    pTree->Columns().AppendColumn(oCol3);
+
+    //set model
+    m_music_model = new MyMusicTreeModel;
+    pTree->AssociateModel(m_music_model.get());
+
+    return(pTree);
+
+}
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC

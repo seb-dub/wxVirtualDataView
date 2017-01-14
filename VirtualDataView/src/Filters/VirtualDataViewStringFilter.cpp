@@ -66,15 +66,25 @@ void wxVirtualDataViewStringFilter::CompileRegEx(void)
         m_sSearchedString.push_back(GetStringValue(m_vReferenceValue));
     }
 
+    m_SetOfStrings.clear();
+    size_t uiNbStrings = m_sSearchedString.Count();
+    size_t uiString;
     if (!m_bCaseSensitive)
     {
-        size_t uiNbStrings = m_sSearchedString.Count();
-        size_t uiString;
         for(uiString = 0; uiString < uiNbStrings; uiString++)
         {
-            m_sSearchedString[uiString].MakeUpper();
+            m_sSearchedString[uiString].MakeLower();
+            m_SetOfStrings.insert(m_sSearchedString[uiString]);
         }
     }
+    else
+    {
+        for(uiString = 0; uiString < uiNbStrings; uiString++)
+        {
+            m_SetOfStrings.insert(m_sSearchedString[uiString]);
+        }
+    }
+
 
     //regular expression compilation. Only 1st string taken into account
     //in case of multiple strings in the reference value
@@ -95,7 +105,7 @@ bool wxVirtualDataViewStringFilter::AcceptString(const wxVariant& rvValue)
     wxString sValue = GetStringValue(rvValue);
 
     //capitalize if needed
-    if (!m_bCaseSensitive) sValue.MakeUpper();
+    if (!m_bCaseSensitive) sValue.MakeLower();
 
     //match
     if (m_bRegEx)
@@ -118,20 +128,23 @@ bool wxVirtualDataViewStringFilter::AcceptString(const wxVariant& rvValue)
     else
     {
         //standard match
-        size_t uiNbStrings = m_sSearchedString.Count();
-        size_t uiString;
         if (m_bFullMatch)
         {
-            for(uiString = 0; uiString < uiNbStrings; uiString++)
-            {
-                if (sValue == m_sSearchedString[uiString]) return(true);
-            }
+            if (m_SetOfStrings.find(sValue) != m_SetOfStrings.end()) return(true);
+            return(false);
         }
         else
         {
+            size_t uiLen = sValue.Len();
+            size_t uiNbStrings = m_sSearchedString.Count();
+            size_t uiString, uiLenSearched;
+
             for(uiString = 0; uiString < uiNbStrings; uiString++)
             {
-                if (sValue.Find(m_sSearchedString[uiString]) != wxNOT_FOUND) return(true);
+                const wxString &rsSearchedString = m_sSearchedString[uiString];
+                uiLenSearched = rsSearchedString.Len();
+                if (uiLenSearched > uiLen) continue;
+                if (sValue.Find(rsSearchedString) != wxNOT_FOUND) return(true);
             }
         }
     }

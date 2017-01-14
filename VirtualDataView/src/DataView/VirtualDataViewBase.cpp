@@ -53,7 +53,12 @@ wxIMPLEMENT_ABSTRACT_CLASS(wxVirtualDataViewBase, wxControl);
   */
 wxVirtualDataViewBase::wxVirtualDataViewBase(void)
     : wxSystemThemedControl<wxControl>(),
-      m_pDataModel(WX_VDV_NULL_PTR)
+      m_pDataModel(WX_VDV_NULL_PTR),
+      m_pStateModel(WX_VDV_NULL_PTR),
+      m_pModelRenderer(WX_VDV_NULL_PTR),
+      m_bOwnDataModel(true),
+      m_bOwnStateModel(true),
+      m_bOwnModelRenderer(true)
 {
     Init(WX_VDV_NULL_PTR, WX_VDV_NULL_PTR, WX_VDV_NULL_PTR);
 }
@@ -85,7 +90,10 @@ wxVirtualDataViewBase::wxVirtualDataViewBase(wxWindow *pParent, wxWindowID id, c
     : wxSystemThemedControl<wxControl>(),
       m_pDataModel(WX_VDV_NULL_PTR),
       m_pStateModel(WX_VDV_NULL_PTR),
-      m_pModelRenderer(WX_VDV_NULL_PTR)
+      m_pModelRenderer(WX_VDV_NULL_PTR),
+      m_bOwnDataModel(true),
+      m_bOwnStateModel(true),
+      m_bOwnModelRenderer(true)
 {
     Init(pDataModel, pStateModel, pModelRenderer);
     Create(pParent, id, pos, size, lStyle, sName);
@@ -126,13 +134,32 @@ void wxVirtualDataViewBase::Init(wxVirtualIDataModel *pDataModel,
   */
 void wxVirtualDataViewBase::Release(void)
 {
-    if (m_pDataModel) delete(m_pDataModel);
+    ReleaseDataModel();
+    ReleaseStateModel();
+    ReleaseModelRenderer();
+}
+
+/** Release the data model
+  */
+void wxVirtualDataViewBase::ReleaseDataModel(void)
+{
+    if ((m_pDataModel) && (m_bOwnDataModel)) delete(m_pDataModel);
     m_pDataModel = WX_VDV_NULL_PTR;
+}
 
-    if (m_pStateModel) delete(m_pStateModel);
+/** Release the state model
+  */
+void wxVirtualDataViewBase::ReleaseStateModel(void)
+{
+    if ((m_pStateModel) && (m_bOwnStateModel)) delete(m_pStateModel);
     m_pStateModel = WX_VDV_NULL_PTR;
+}
 
-    if (m_pModelRenderer) delete(m_pModelRenderer);
+/** Release the model renderer
+  */
+void wxVirtualDataViewBase::ReleaseModelRenderer(void)
+{
+    if ((m_pModelRenderer) && (m_bOwnModelRenderer)) delete(m_pModelRenderer);
     m_pModelRenderer = WX_VDV_NULL_PTR;
 }
 
@@ -304,14 +331,18 @@ wxVirtualIDataModel* wxVirtualDataViewBase::GetDataModel(void) const
     return(m_pDataModel);
 }
 
-/** Set the current data model. Current proxies will be kept
+/** Set the current data model. Current proxies will be deleted
   * \param pModel [input] : the new data model to associate with the control.
-  *                         Ownership is taken: it must have been allocated with "new"
+  *                         If ownership is taken: it must have been allocated with "new"
+  *                         See HasDataModelOwnership(), TakeDataModelOwnership() and ReleaseDataModelOwnership() for more info
   */
 void wxVirtualDataViewBase::SetDataModel(wxVirtualIDataModel *pModel)
 {
-    if (m_pDataModel == pModel) return;
-    if (m_pDataModel) delete(m_pDataModel);
+    wxVirtualIDataModel *pBaseModel = GetBaseDataModel();
+    if (pBaseModel == pModel) return;
+
+    DetachAllProxyModels();
+    ReleaseDataModel();
     m_pDataModel = pModel;
 
     if (m_pModelRenderer) m_pModelRenderer->OnDataModelChanged();
@@ -320,6 +351,30 @@ void wxVirtualDataViewBase::SetDataModel(wxVirtualIDataModel *pModel)
     if (m_pOwner) m_pOwner->InvalidateBestSize();
 }
 
+/** Check if the control has ownership of the data model
+  * \return true if the data model is owned by the control. If so, the data model
+  *         is deleted by the destructor (using "delete")
+  *         false if the data model is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewBase::HasDataModelOwnership(void) const
+{
+    return(m_bOwnDataModel);
+}
+
+/** Take ownership of the data model
+  * The data model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewBase::TakeDataModelOwnership(void)
+{
+    m_bOwnDataModel = true;
+}
+
+/** Release data model ownership
+  */
+void wxVirtualDataViewBase::ReleaseDataModelOwnership(void)
+{
+    m_bOwnDataModel = false;
+}
 
 //--------------------- PROXY DATA MODELS ---------------------------//
 /** Attach a proxy data model to the chain of models
@@ -434,13 +489,38 @@ wxVirtualIStateModel* wxVirtualDataViewBase::GetStateModel(void) const
 void wxVirtualDataViewBase::SetStateModel(wxVirtualIStateModel *pStateModel)
 {
     if (m_pStateModel == pStateModel) return;
-    if (m_pStateModel) delete(m_pStateModel);
+    ReleaseStateModel();
     m_pStateModel = pStateModel;
 
     if (m_pModelRenderer) m_pModelRenderer->OnLayoutChanged();
 
     InvalidateBestSize();
     if (m_pOwner) m_pOwner->InvalidateBestSize();
+}
+
+/** Check if the control has ownership of the state model
+  * \return true if the state model is owned by the control. If so, the state model
+  *         is deleted by the destructor (using "delete")
+  *         false if the state model is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewBase::HasStateModelOwnership(void) const
+{
+    return(m_bOwnStateModel);
+}
+
+/** Take ownership of the state model
+  * The state model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewBase::TakeStateModelOwnership(void)
+{
+    m_bOwnStateModel = true;
+}
+
+/** Release state model ownership
+  */
+void wxVirtualDataViewBase::ReleaseStateModelOwnership(void)
+{
+    m_bOwnStateModel = false;
 }
 
 //---------------------- MODEL RENDERER -----------------------------//
@@ -460,13 +540,38 @@ wxVirtualIModelRenderer* wxVirtualDataViewBase::GetModelRenderer(void) const
 void wxVirtualDataViewBase::SetModelRenderer(wxVirtualIModelRenderer *pModelRenderer)
 {
     if (m_pModelRenderer == pModelRenderer) return;
-    if (m_pModelRenderer) delete(m_pModelRenderer);
+    ReleaseModelRenderer();
     m_pModelRenderer = pModelRenderer;
     if (m_pModelRenderer)
     {
         m_pModelRenderer->SetClientWindow(this);
         m_pModelRenderer->OnDataModelChanged();
     }
+}
+
+/** Check if the control has ownership of the model renderer
+  * \return true if the model renderer is owned by the control. If so, the model renderer
+  *         is deleted by the destructor (using "delete")
+  *         false if the model renderer is not owned by the control (not deleted by destructor)
+  */
+bool wxVirtualDataViewBase::HasModelRendererOwnership(void) const
+{
+    return(m_bOwnModelRenderer);
+}
+
+/** Take ownership of the model renderer
+  * The model will be deleted by the destructor, or by SetDataModel
+  */
+void wxVirtualDataViewBase::TakeModelRendererOwnership(void)
+{
+    m_bOwnModelRenderer = true;
+}
+
+/** Release model renderer ownership
+  */
+void wxVirtualDataViewBase::ReleaseModelRendererOwnership(void)
+{
+    m_bOwnModelRenderer = false;
 }
 
 //------------------- INTERFACE : EVENT HANDLING --------------------//
