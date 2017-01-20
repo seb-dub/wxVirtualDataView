@@ -20,6 +20,7 @@
 #include <wx/VirtualDataView/ModelRenderer/VirtualListModelRenderer.h>
 #include <wx/VirtualDataView/Types/VariantUtils.h>
 #include <wx/hashset.h>
+#include <wx/log.h>
 
 //--------------------- CONSTRUCTORS & DESTRUCTOR -------------------//
 

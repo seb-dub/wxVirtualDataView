@@ -42,6 +42,8 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewStdFilterEditor : public wxVirtualDataVie
         //data
         wxVirtualDataViewFilterComboCtrl*   m_pComboBox;                            ///< \brief the combobox
         wxComboboxState*                    m_pComboBoxState;                       ///< \brief combobox state
+        bool                                m_bInitFilterOnDropDown;                ///< \brief true if InitFilter should be called only on drop down
+        bool                                m_bIsDroppingDown;                      ///< \brief true if the combo drop arrow has been pressed
 
         //methods
         void Copy(const wxVirtualDataViewStdFilterEditor &rhs);                     ///< \brief copy object

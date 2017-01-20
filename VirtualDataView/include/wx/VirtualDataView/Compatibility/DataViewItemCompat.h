@@ -14,6 +14,7 @@
 #if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
 
 #include <wx/itemid.h>
+#include <wx/dynarray.h>
 
 //------------------------- DECLARATION -----------------------------//
 

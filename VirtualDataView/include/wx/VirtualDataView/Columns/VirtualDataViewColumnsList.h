@@ -50,7 +50,7 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewColumnsList
 
     protected:
         //typedef
-        typedef wxVector<wxVirtualDataViewColumn>   TArrayOfColumns;    ///< \brief array of columns
+        typedef wxVector<wxVirtualDataViewColumn*>   TArrayOfColumns;   ///< \brief array of columns
 
         //data
         TArrayOfColumns     m_vColumns;                                 ///< \brief array of columnson

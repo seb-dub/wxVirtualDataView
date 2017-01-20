@@ -19,6 +19,10 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewRenderer;
 class WXDLLIMPEXP_VDV wxVirtualDataViewFilter;
 class WXDLLIMPEXP_VDV wxVirtualDataViewIFilterEditor;
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+class WXDLLIMPEXP_ADV wxDataViewColumn;
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 /** \class wxVirtualDataViewColumn : a column for the wxVirtualDataViewCtrl control
   */
 class WXDLLIMPEXP_VDV wxVirtualDataViewColumn
@@ -165,6 +169,12 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewColumn
         void SetDate(void);                                                             ///< \brief set the attribute as date
         void SetTime(void);                                                             ///< \brief set the attribute as time
         void SetColour(void);                                                           ///< \brief set the attribute as colour
+
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+        //convert to wxDataViewColumn
+        wxDataViewColumn ConvertToDataViewCol(void) const;                              ///< \brief convert to a wxDataViewColumn
+        void SetFromDataViewCol(const wxDataViewColumn &rCol);                          ///< \brief set from a wxDataViewColumn
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     protected:
         //data

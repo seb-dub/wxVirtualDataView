@@ -2576,6 +2576,9 @@ void wxVirtualTreeModelRenderer::SetAllScrollbars(wxSize sVirtualSize, size_t ui
             iVPos   = 0;
             iVPage  = 0;
             iVRange = 0;
+
+            //adjust first line: it must be 0
+            InvalidateFirstVisibleItem();
         }
         else
         {
@@ -2949,8 +2952,7 @@ bool wxVirtualTreeModelRenderer::EnsureItemVisible(const wxVirtualItemID &rID,
         id = oStackOfNodes.top();
         oStackOfNodes.pop();
 
-        size_t uiRank = pDataModel->GetItemRank(id, pStateModel);
-        Expand(id, false, false, true, uiRank);
+        Expand(id, false, false, true, true);
     }
 
     //make visible

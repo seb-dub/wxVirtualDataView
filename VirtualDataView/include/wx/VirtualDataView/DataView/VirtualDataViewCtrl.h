@@ -30,7 +30,8 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewEvent;
 class WXDLLIMPEXP_VDV wxVirtualDataViewFilter;
 
 #if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
-class WXDLLIMPEXP_VDV wxDataViewModel;
+    class WXDLLIMPEXP_VDV wxDataViewModel;
+    #include <wx/dataview.h>
 #endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
 extern const char wxVirtualDataViewCtrlNameStr[];
@@ -428,6 +429,155 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewCtrl : public wxSystemThemedControl<wxCon
         //compatibility layer with wxDataViewCtrl
 #if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
         virtual bool  AssociateModel(wxDataViewModel *pDataModel);              ///< \brief associate a new data model
+        wxDataViewModel* GetModel(void);                                        ///< \brief get the wxDataViewModel
+        const wxDataViewModel* GetModel(void) const;                            ///< \brief get the wxDataViewModel
+
+        wxDataViewColumn* PrependTextColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a text column
+        wxDataViewColumn* PrependIconTextColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend an icon/text column
+        wxDataViewColumn* PrependToggleColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_TOGGLE_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                        int iFlags = wxDATAVIEW_COL_RESIZABLE);                 ///< \brief prepend a toggle column (check box)
+        wxDataViewColumn* PrependProgressColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                        int iFlags = wxDATAVIEW_COL_RESIZABLE);                 ///< \brief prepend a progress column
+        wxDataViewColumn* PrependDateColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_ACTIVATABLE,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a date column
+        wxDataViewColumn* PrependBitmapColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a bitmap column
+        wxDataViewColumn* PrependTextColumn(const wxBitmap &rBitmap,
+                        size_t uiField,
+                        wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                        int iWidth = -1,
+                        wxAlignment iAlign = wxALIGN_NOT,
+                        int iFlags = wxDATAVIEW_COL_RESIZABLE);                 ///< \brief prepend a text column
+        wxDataViewColumn* PrependIconTextColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend an icon text column
+        wxDataViewColumn* PrependToggleColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_TOGGLE_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a toggle column
+        wxDataViewColumn* PrependProgressColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a progress column
+        wxDataViewColumn* PrependDateColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_ACTIVATABLE,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///< \brief prepend a date column
+        wxDataViewColumn* PrependBitmapColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);             ///<  \brief prepend a bitmap column
+
+        wxDataViewColumn* AppendTextColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a text column
+        wxDataViewColumn* AppendIconTextColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a text + icon column
+        wxDataViewColumn* AppendToggleColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_TOGGLE_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a toggle column
+        wxDataViewColumn* AppendProgressColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a progress column
+        wxDataViewColumn* AppendDateColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_ACTIVATABLE,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a date column
+        wxDataViewColumn* AppendBitmapColumn(const wxString &sLabel,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a bitmap column
+        wxDataViewColumn* AppendTextColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a text column
+        wxDataViewColumn* AppendIconTextColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a text + icon column
+        wxDataViewColumn* AppendToggleColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_TOGGLE_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a toggle column
+        wxDataViewColumn* AppendProgressColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = wxDVC_DEFAULT_WIDTH,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a progress column
+        wxDataViewColumn* AppendDateColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_ACTIVATABLE,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_NOT,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a date column
+        wxDataViewColumn* AppendBitmapColumn(const wxBitmap &rBitmap,
+                            size_t uiField,
+                            wxDataViewCellMode eMode = wxDATAVIEW_CELL_INERT,
+                            int iWidth = -1,
+                            wxAlignment iAlign = wxALIGN_CENTER,
+                            int iFlags = wxDATAVIEW_COL_RESIZABLE);         ///<  \brief append a bitmap column
+
 #endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     protected:

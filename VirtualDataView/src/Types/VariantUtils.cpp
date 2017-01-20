@@ -7,6 +7,9 @@
 
 
 #include <wx/VirtualDataView/Types/VariantUtils.h>
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    #include <wx/dataview.h>
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
 /** Convert a variant to string
   * \param rvValue [input]: the variant to convert
@@ -20,6 +23,15 @@ wxString GetStringValue(const wxVariant &rvValue)
         bt << rvValue;
         return(bt.GetText());
     }
+
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    if (rvValue.GetType() == "wxDataViewIconText")
+    {
+        wxDataViewIconText it;
+        it << rvValue;
+        return(it.GetText());
+    }
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
     return(rvValue.GetString());
 }
 
@@ -128,6 +140,21 @@ EVariantComparison CompareVariants(const wxVariant &vValue1, const wxVariant &vV
         if (res > 0) return(WX_VARIANT_GREATER_THAN);
         return(WX_VARIANT_EQUAL);
     }
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    else if (sType1 == wxT("wxDataViewIconText"))
+    {
+        wxBitmapText bt1;
+        wxBitmapText bt2;
+
+        bt1 << vValue1;
+        bt2 << vValue2;
+
+        int res = bt1.GetText().Cmp(bt2.GetText());
+        if (res < 0) return(WX_VARIANT_LESS_THAN); //str1.Cmp(str2) returns a positive value if str1 > str2
+        if (res > 0) return(WX_VARIANT_GREATER_THAN);
+        return(WX_VARIANT_EQUAL);
+    }
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     return(WX_VARIANT_CANNOT_COMPARE);
 }
@@ -212,6 +239,20 @@ int IsVariantLessThan(const wxVariant &vValue1, const wxVariant &vValue2, bool b
         if (res < 0) return(1); //str1.Cmp(str2) returns a positive value if str1 > str2
         return(0);
     }
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    else if (sType1 == wxT("wxDataViewIconText"))
+    {
+        wxBitmapText bt1;
+        wxBitmapText bt2;
+
+        bt1 << vValue1;
+        bt2 << vValue2;
+
+        int res = bt1.GetText().Cmp(bt2.GetText());
+        if (res < 0) return(1); //str1.Cmp(str2) returns a positive value if str1 > str2
+        return(0);
+    }
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     return(-1);
 }

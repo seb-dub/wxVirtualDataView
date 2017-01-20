@@ -13,8 +13,11 @@
 #include <wx/colour.h>
 #include <wx/font.h>
 
-//-------------------------------- DECLARATION -------------------------------------//
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    class WXDLLIMPEXP_ADV wxDataViewItemAttr;
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
+//-------------------------------- DECLARATION -------------------------------------//
 /** \class wxVirtualDataViewItemAttr : defines a graphic attributes. Used by renderers
   */
 class WXDLLIMPEXP_VDV wxVirtualDataViewItemAttr
@@ -72,6 +75,13 @@ class WXDLLIMPEXP_VDV wxVirtualDataViewItemAttr
         bool IsSame(const wxVirtualDataViewItemAttr &rhs) const;        ///< \brief check if the 2 attributes are identical
         bool operator==(const wxVirtualDataViewItemAttr &rhs) const;    ///< \brief operator ==
         bool operator!=(const wxVirtualDataViewItemAttr &rhs) const;    ///< \brief operator !=
+
+        //compatibility with wxDataViewCtrl
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+        wxVirtualDataViewItemAttr(const wxDataViewItemAttr &rAttr);     ///< \brief constructor from a wxDataViewAttr
+        void FromDataViewAttr(const wxVirtualDataViewItemAttr &rAttr);  ///< \brief set from a wxVirtualDataViewItemAttr
+        wxVirtualDataViewItemAttr ToDataViewAttr(void) const;           ///< \brief convert to a wxVirtualDataViewItemAttr
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
 
     protected:
         //data

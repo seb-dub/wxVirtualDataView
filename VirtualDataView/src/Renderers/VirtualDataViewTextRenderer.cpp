@@ -19,7 +19,10 @@
 wxVirtualDataViewTextRenderer::wxVirtualDataViewTextRenderer(EEllipsizeMode eMode,
                                                              EHAlign eHAlign,
                                                              EVAlign eVAlign)
-    : wxVirtualDataViewRenderer()
+    : wxVirtualDataViewRenderer(),
+      m_eEllipsizeMode(eMode),
+      m_eHorizontalAlignment(eHAlign),
+      m_eVerticalAlignment(eVAlign)
 {
 
 }

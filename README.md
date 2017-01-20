@@ -12,8 +12,12 @@ Building:
     guarded using #if ... #endif, and will not break anything if not present
 
 BUGS:
+	- not really bugs, but many performances improvement to do
 
 TODO List:
+	- performance : sorting a big tree is slow. This is not the sorting which is slow, but mainly the the scrolling. Caching alleviates the problem, but does not solve it
+	- performance : filtering UI. The filtering itselfs is fast enough, but the UI is not responsive when the amount of items is large (> 1000000)
+	- compatibility layer: implement the column interface for wxDataViewColumn. Maybe store a duplicate object to allow having both wxDVC columns & wxVirtualDVC columns
 
 Add a CMake makefile
 

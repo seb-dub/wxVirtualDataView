@@ -16,6 +16,7 @@ wxVirtualFilteringDataModel::wxVirtualFilteringDataModel(void)
     : wxVirtualIArrayProxyDataModel(),
       m_bApplyFiltersForGetAllValues(true)
 {
+    SetMinAmountOfChildrenForCaching(1);
 }
 
 /** Destructor

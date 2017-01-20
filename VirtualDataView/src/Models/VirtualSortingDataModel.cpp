@@ -7,6 +7,7 @@
 
 #include <wx/VirtualDataView/Models/VirtualSortingDataModel.h>
 #include <wx/VirtualDataView/Types/VariantUtils.h>
+//#include <wx/log.h>
 
 //--------------- CONSTRUCTORS & DESTRUCTOR -------------------------//
 /** Default constructor
@@ -15,6 +16,8 @@ wxVirtualSortingDataModel::wxVirtualSortingDataModel(void)
     : wxVirtualIArrayProxyDataModel(),
       m_bFastSorting(true)
 {
+    SetMinAmountOfChildrenForCaching(5);
+    SetCacheSize(1000000);
 }
 
 /** Destructor
@@ -314,6 +317,7 @@ struct TVariant
 
     void Reserve(size_t uiSize)
     {
+        m_Variant.clear();
         m_Variant.reserve(uiSize);
     }
 
@@ -453,8 +457,10 @@ void wxVirtualSortingDataModel::SortItems(wxVirtualItemIDs &vIDs)
     if (!IsSorting()) return;
     if (vIDs.size() < 2) return;
 
+//    wxLogMessage("Sorting children = %d", vIDs.size());
     if (m_bFastSorting) FastSort(vIDs);
     else                MemoryEfficientSort(vIDs);
+//    wxLogMessage("Sorted children = %d", vIDs.size());
 }
 
 //----------------------- INTERFACE ---------------------------------//

@@ -93,6 +93,10 @@
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Columns/VirtualDataViewColumnsList.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewItemCompat.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewModelCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/DataViewRendererCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/VirtualDataViewEditorCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/VirtualDataViewModelCompat.h" />
+		<Unit filename="VirtualDataView/include/wx/VirtualDataView/Compatibility/VirtualDataViewRendererCompat.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewBase.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewColHeader.h" />
 		<Unit filename="VirtualDataView/include/wx/VirtualDataView/DataView/VirtualDataViewCornerHeader.h" />
@@ -188,6 +192,10 @@
 		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumn.cpp" />
 		<Unit filename="VirtualDataView/src/Columns/VirtualDataViewColumnsList.cpp" />
 		<Unit filename="VirtualDataView/src/Compatibility/DataViewModelCompat.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/DataViewRendererCompat.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/VirtualDataViewEditorCompat.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/VirtualDataViewModelCompat.cpp" />
+		<Unit filename="VirtualDataView/src/Compatibility/VirtualDataViewRendererCompat.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewBase.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewColHeader.cpp" />
 		<Unit filename="VirtualDataView/src/DataView/VirtualDataViewCornerHeader.cpp" />

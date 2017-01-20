@@ -276,6 +276,8 @@ class wxCompareFunctorBase
             int iRes = IsVariantLessThan(m_vValues[i1], m_vValues[i2]);
             if (iRes < 0) return(i1 < i2);
             if (iRes > 0) return(true);
+//            int iRes = m_vValues[i1].Cmp(m_vValues[i2]);
+//            if (iRes < 0) return(true);
             return(false);
         }
 

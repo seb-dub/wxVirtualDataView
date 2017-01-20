@@ -19,7 +19,10 @@
 wxVirtualDataViewBitmapTextRenderer::wxVirtualDataViewBitmapTextRenderer(EEllipsizeMode eMode,
                                                                          EHAlign eHAlign,
                                                                          EVAlign eVAlign)
-    : wxVirtualDataViewRenderer()
+    : wxVirtualDataViewRenderer(),
+      m_eEllipsizeMode(eMode),
+      m_eHorizontalAlignment(eHAlign),
+      m_eVerticalAlignment(eVAlign)
 {
 
 }
@@ -62,7 +65,11 @@ void wxVirtualDataViewBitmapTextRenderer::Render(wxWindow *pWindow, const wxRect
     //background
     RenderBackground(pWindow, rRect, rDC, pAttr);
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    if ((vValue.GetType() != "wxBitmapText") && (vValue.GetType() != "wxDataViewIconText"))
+#else
     if (vValue.GetType() != "wxBitmapText")
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
     {
         wxString sValue = vValue.GetString();
         RenderText(pWindow, rRect, rDC, sValue,
@@ -84,6 +91,16 @@ void wxVirtualDataViewBitmapTextRenderer::Render(wxWindow *pWindow, const wxRect
     r.width -= 1;
     wxPoint pt = r.GetLeftTop();
     wxIcon &rIcon = oValue.GetIcon();
+    int iHeight = rIcon.GetHeight();
+    switch(m_eVerticalAlignment)
+    {
+        case WX_VERT_ALIGN_BOTTOM   :  pt.y = rRect.GetBottom() - iHeight; break;
+
+        case WX_VERT_ALIGN_CENTRE   :  pt.y = (rRect.GetTop() + rRect.GetBottom() - iHeight) / 2; break;
+
+        case WX_VERT_ALIGN_TOP      :
+        default                     :   break;
+    }
     rDC.DrawIcon(rIcon, pt);
 
     int w = rIcon.GetWidth() + 1;

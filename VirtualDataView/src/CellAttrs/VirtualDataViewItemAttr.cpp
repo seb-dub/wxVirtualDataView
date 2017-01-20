@@ -8,6 +8,10 @@
 #include <wx/VirtualDataView/CellAttrs/VirtualDataViewItemAttr.h>
 #include <wx/settings.h>
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    #include <wx/dataview.h>
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 //----------- CONSTRUCTORS & DESTRUCTOR -----------------------------//
 /** Copy constructor
   */
@@ -154,3 +158,45 @@ bool wxVirtualDataViewItemAttr::IsSame(const wxVirtualDataViewItemAttr &rhs) con
 
     return(true);
 }
+
+//------------- COMPATIBILITY WITH wxDataViewCtrl -------------------//
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+/** Constructor from a wxDataViewAttr
+  * \param rAttr [input]: the object to copy
+  */
+wxVirtualDataViewItemAttr::wxVirtualDataViewItemAttr(const wxDataViewItemAttr &rAttr)
+    : m_cForeColour(rAttr.GetColour()),
+      m_cBackColour(rAttr.GetBackgroundColour()),
+      m_Font(),
+      m_bIsBold(rAttr.GetBold()),
+      m_bIsItalic(rAttr.GetItalic())
+{
+
+}
+
+/** Set from a wxVirtualDataViewItemAttr
+  * \param rAttr [input]: the object to copy
+  */
+void wxVirtualDataViewItemAttr::FromDataViewAttr(const wxVirtualDataViewItemAttr &rAttr)
+{
+    m_cForeColour = rAttr.GetColour();
+    m_cBackColour = rAttr.GetBackgroundColour();
+    m_Font        = wxFont();
+    m_bIsBold     = rAttr.GetBold();
+    m_bIsItalic   = rAttr.GetItalic();
+}
+
+/** Convert to a wxVirtualDataViewItemAttr
+  * \return the wxDataViewItemAttr
+  */
+wxVirtualDataViewItemAttr wxVirtualDataViewItemAttr::ToDataViewAttr(void) const
+{
+    wxVirtualDataViewItemAttr oAttr;
+    oAttr.SetColour(m_cForeColour);
+    oAttr.SetBackgroundColour(m_cBackColour);
+    oAttr.SetBold(m_bIsBold);
+    oAttr.SetItalic(m_bIsItalic);
+    return(oAttr);
+}
+
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC

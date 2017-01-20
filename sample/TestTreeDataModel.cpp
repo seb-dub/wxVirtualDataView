@@ -4,6 +4,15 @@
 #include <wx/VirtualDataView/Types/BitmapText.h>
 #include <wx/artprov.h>
 
+//3 levels hierarchy
+//  level 1 : NB_ITEMS_LEVEL_1 items. Index starting at 1. Stored in main ID. Row = 0, Column = 0
+//  level 2 : each level 1 item has NB_ITEMS_LEVEL_2 items. Index starting at 1. Stored in row ID, column ID = 0
+//  level 3 : each level 2 item has NB_ITEMS_LEVEL_3 items. Index starting at 1. Stored in column ID
+
+#define NB_ITEMS_LEVEL_1        10
+#define NB_ITEMS_LEVEL_2        10000
+#define NB_ITEMS_LEVEL_3        10
+
 //-------------------- NESTED CLASS TID -----------------------------//
 TestTreeDataModel::TID::TID(wxVirtualItemID id, size_t uiField)
                 : m_id(id), m_uiField(uiField)
@@ -41,15 +50,6 @@ TestTreeDataModel::~TestTreeDataModel(void)
 }
 
 //------------ INTERFACE IMPLEMENTATION -----------------------------//
-//3 levels hierarchy
-//  level 1 : NB_ITEMS_LEVEL_1 items. Index starting at 1. Stored in main ID. Row = 0, Column = 0
-//  level 2 : each level 1 item has NB_ITEMS_LEVEL_2 items. Index starting at 1. Stored in row ID, column ID = 0
-//  level 3 : each level 2 item has NB_ITEMS_LEVEL_3 items. Index starting at 1. Stored in column ID
-
-#define NB_ITEMS_LEVEL_1        10
-#define NB_ITEMS_LEVEL_2        1000
-#define NB_ITEMS_LEVEL_3        1000
-
 /** Get the parent item ID
   * \param rID [input]: the child item
   * \return the parent item
@@ -267,6 +267,7 @@ wxVariant TestTreeDataModel::GetItemData(const wxVirtualItemID &rID,
     }
 
     wxString sValue = wxString::Format("ID=%d row=%d col=%d field=%d", rID.GetInt32(), rID.GetRow(), rID.GetColumn(), uiField);
+//    wxString sValue = wxString::Format("col=%d field=%d", rID.GetColumn(), uiField);
     return(wxVariant(sValue));
 }
 
@@ -304,5 +305,113 @@ wxVirtualDataViewItemAttr* TestTreeDataModel::GetItemAttribute(const wxVirtualIt
     if (m_bEmpty) return(NULL);
     if (rID.GetInt32() % 2 == 0) return(&m_attrEven);
     return(&m_attrOdd);
+}
+
+//------- FILTERING - GET ALL VALUES AS STRINGS ---------------------//
+/** Get all the values of a field
+  * \param rvStrings [output]: an array of string. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void TestTreeDataModel::GetAllValues(wxArrayString &rvStrings, size_t uiField,
+                                     wxVirtualIStateModel *pStateModel)
+{
+    if (pStateModel)
+    {
+        wxVirtualIDataModel::GetAllValues(rvStrings, uiField, pStateModel);
+        return;
+    }
+
+    size_t uiSize = NB_ITEMS_LEVEL_1 * NB_ITEMS_LEVEL_2 * NB_ITEMS_LEVEL_3;
+    rvStrings.clear();
+    rvStrings.reserve(uiSize);
+    rvStrings.resize(uiSize);
+
+    char vStatic[100];
+
+    size_t i, j, k;
+    size_t uiMax = 10000000;
+
+    uiSize = 0;
+    for(i=0;i<NB_ITEMS_LEVEL_1;i++)
+    {
+        for(j=0;j<NB_ITEMS_LEVEL_2;j++)
+        {
+            for(k=0;k<NB_ITEMS_LEVEL_3;k++)
+            {
+                snprintf(vStatic, sizeof(vStatic) / sizeof(char), "ID=%llu row=%llu col=%llu field=%llu", i, j, k, uiField);
+                rvStrings[uiSize] = vStatic;
+                //wxString s(vStatic);
+                //rvStrings.push_back(s);
+
+//                rvStrings.push_back(wxString::Format("ID=%d row=%d col=%d field=%d", i, j, k, uiField));
+
+                uiSize++;
+                if (uiSize >= uiMax) return;
+            }
+        }
+    }
+}
+
+
+//------- FILTERING - GET ALL VALUES AS VARIANT ---------------------//
+/** Get all the values inside an array of variants
+  * \param rvVariants [output]: an array of variants. Previous content is lost
+  *                           It contains the list of all values
+  *                           Each value should be represented only once
+  * \param uiField     [input]: the field to scan
+  * \param pStateModel [input]: the state model. If NULL, all items are scanned
+  *                             if Non-NULL, the children of collapsed items are ignored
+  *
+  * The default implementation use:
+  *     NextItem (if pStateModel != NULL)
+  *     GetChildCount / GetChild (if pStateModel == NULL)
+  *     GetItemData
+  *  The values are stored as strings in a wxArrayString in the output variant
+  *
+  * O(n) time, O(n) space
+  * Reimplementation strongly recommended if filtering is used
+  */
+void TestTreeDataModel::GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                     wxVirtualIStateModel *pStateModel)
+{
+    if (pStateModel)
+    {
+        wxVirtualIDataModel::GetAllValues(rvVariants, uiField, pStateModel);
+        return;
+    }
+
+    size_t uiSize = NB_ITEMS_LEVEL_1 * NB_ITEMS_LEVEL_2 * NB_ITEMS_LEVEL_3;
+    rvVariants.clear();
+    rvVariants.reserve(uiSize);
+
+    size_t i, j, k;
+    size_t uiMax = 1000000;
+    uiSize = 0;
+    for(i=0;i<NB_ITEMS_LEVEL_1;i++)
+    {
+        for(j=0;j<NB_ITEMS_LEVEL_2;j++)
+        {
+            for(k=0;k<NB_ITEMS_LEVEL_3;k++)
+            {
+                rvVariants.push_back(wxString::Format("ID=%d row=%d col=%d field=%d", i, j, k, uiField));
+                uiSize++;
+                if (uiSize >= uiMax) return;
+            }
+        }
+    }
+
 }
 

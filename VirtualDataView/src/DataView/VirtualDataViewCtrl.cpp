@@ -28,7 +28,7 @@
 
 //includes for compatibility layer
 #if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
-    #include <wx/VirtualDataView/Compatibility/DataViewModelCompat.h>
+    #include <wx/VirtualDataView/Compatibility/VirtualDataViewModelCompat.h>
 #include <wx/VirtualDataView/ModelRenderer/VirtualTreeModelRenderer.h>
 #include <wx/VirtualDataView/ModelRenderer/VirtualListModelRenderer.h>
     #include <wx/dataview.h>
@@ -1776,6 +1776,7 @@ WX_VDV_INLINE void VectorToHashSet(TSetOfIDs &oSetOfIDs, const wxVirtualItemIDs 
   */
 WX_VDV_INLINE void HashSetToVector(wxVirtualItemIDs &vIDs, const TSetOfIDs &oSetOfIDs)
 {
+    vIDs.clear();
     vIDs.reserve(oSetOfIDs.size() + vIDs.size());
     TSetOfIDs::const_iterator it    = oSetOfIDs.begin();
     TSetOfIDs::const_iterator itEnd = oSetOfIDs.end();
@@ -3634,7 +3635,7 @@ bool wxVirtualDataViewCtrl::IsFiltering(void)
 bool wxVirtualDataViewCtrl::AssociateModel(wxDataViewModel *pDataModel)
 {
     if (!pDataModel) return(false);
-    wxDataViewModelCompat *pCompatModel = new wxDataViewModelCompat(pDataModel);
+    wxVirtualDataViewModelCompat *pCompatModel = new wxVirtualDataViewModelCompat(pDataModel);
     SetDataModel(pCompatModel);
 
     if (pDataModel->IsListModel())
@@ -3646,6 +3647,28 @@ bool wxVirtualDataViewCtrl::AssociateModel(wxDataViewModel *pDataModel)
         SetModelRenderer(new wxVirtualTreeModelRenderer(m_pClientArea, this));
     }
     return(true);
+}
+
+/** Get the wxDataViewModel
+  * \return the wxDataViewModel
+  */
+wxDataViewModel* wxVirtualDataViewCtrl::GetModel(void)
+{
+    wxVirtualIDataModel *pDataModel = GetDataModel();
+    if (!pDataModel) return(WX_VDV_NULL_PTR);
+
+    return(((wxVirtualDataViewModelCompat*) pDataModel)->GetModel());
+}
+
+/** Get the wxDataViewModel
+  * \return the wxDataViewModel
+  */
+const wxDataViewModel* wxVirtualDataViewCtrl::GetModel(void) const
+{
+    wxVirtualIDataModel *pDataModel = GetDataModel();
+    if (!pDataModel) return(WX_VDV_NULL_PTR);
+
+    return(((const wxVirtualDataViewModelCompat*) pDataModel)->GetModel());
 }
 
 #endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC

@@ -10,6 +10,10 @@
 #include <wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttr.h>
 #include <wx/VirtualDataView/FilterEditors/VirtualDataViewIFilterEditor.h>
 
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+    #include<wx/dataview.h>
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC
+
 //-------------------- STATIC MEMBERS -------------------------------//
 const size_t wxVirtualDataViewColumn::wxVDVC_DEFAULT_WIDTH = 80;
 
@@ -646,3 +650,50 @@ void wxVirtualDataViewColumn::SetColour(void)
     if (!m_pAttributes) m_pAttributes = new wxVirtualDataViewCellAttr;
     if (m_pAttributes) m_pAttributes->SetColour();
 }
+
+//-------------- CONVERT TO wxDataViewColumn ------------------------//
+#if WX_USE_COMPATIBILITY_LAYER_WITH_DVC != 0
+/** Convert to a wxDataViewColumn
+  * \return the equivalent wxDataViewColumn
+  */
+wxDataViewColumn wxVirtualDataViewColumn::ConvertToDataViewCol(void) const
+{
+    wxDataViewRenderer *pRenderer = WX_VDV_NULL_PTR;
+    wxDataViewColumn oCol(m_Bitmap, pRenderer, m_uiModelColumn, m_lWidth, m_Alignment, m_iFlags);
+    oCol.SetTitle(m_sTitle);
+    oCol.SetMinWidth(m_lMinWidth);
+    if (m_bSort) oCol.SetSortOrder(m_bSortAscending);
+    else         oCol.UnsetAsSortKey();
+
+    if (m_bIsShown) oCol.SetHidden(false);
+    else            oCol.SetHidden(true);
+    return(oCol);
+}
+
+/** Set from a wxDataViewColumn
+  * \param rCol [input]: the wxDataViewColumn to copy
+  */
+void wxVirtualDataViewColumn::SetFromDataViewCol(const wxDataViewColumn &rCol)
+{
+    m_uiModelColumn     = rCol.GetModelColumn();
+    m_Bitmap            = rCol.GetBitmap();
+    m_sTitle            = rCol.GetTitle();
+    m_lWidth            = rCol.GetWidth();
+    m_lMinWidth         = rCol.GetMinWidth();
+    m_Alignment         = rCol.GetAlignment();
+    m_iFlags            = rCol.GetFlags();
+    m_bSort             = rCol.IsSortKey();
+    m_bSortAscending    = rCol.IsSortOrderAscending();
+    m_bIsShown          = rCol.IsShown();
+    wxDataViewRenderer *pRenderer = rCol.GetRenderer();
+    if (pRenderer)
+    {
+
+    }
+    else
+    {
+        SetString();
+    }
+}
+
+#endif // WX_USE_COMPATIBILITY_LAYER_WITH_DVC

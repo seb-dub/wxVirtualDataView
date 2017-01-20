@@ -259,12 +259,12 @@ void wxVirtualDataViewRenderer::RenderText(wxWindow *pWindow,
     else
         sText = rsText;
     int iMode = rDC.GetBackgroundMode();
-    rDC.SetBackgroundMode(wxPENSTYLE_TRANSPARENT);
+    if (iMode != wxPENSTYLE_TRANSPARENT) rDC.SetBackgroundMode(wxPENSTYLE_TRANSPARENT);
 
     wxDCClipper dcc(rDC, rRect); //wxDC::DrawLabel needs this, at least on MSW
     if (rState.IsSelected()) GetRenderer().DrawItemSelectionRect(pWindow, rDC, r, iFlags);
     rDC.DrawLabel(sText, rRect, iAlign);
-    rDC.SetBackgroundMode(iMode);
+    if (iMode != wxPENSTYLE_TRANSPARENT) rDC.SetBackgroundMode(iMode);
     //wxRendererNative::DrawItemText does not respect the theme colour
 //    GetRenderer().DrawItemText(pWindow, rDC, rsText, r,
 //                               iAlign, iFlags,

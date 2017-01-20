@@ -18,7 +18,9 @@
 wxVirtualDataViewStdFilterEditor::wxVirtualDataViewStdFilterEditor(void)
     : wxVirtualDataViewIFilterEditor(),
       m_pComboBox(WX_VDV_NULL_PTR),
-      m_pComboBoxState(new wxComboboxState)
+      m_pComboBoxState(new wxComboboxState),
+      m_bInitFilterOnDropDown(true),
+      m_bIsDroppingDown(false)
 {
 
 }
@@ -165,7 +167,12 @@ void wxVirtualDataViewStdFilterEditor::ClearFilter(void)
 void wxVirtualDataViewStdFilterEditor::InitFilter(wxVirtualIDataModel *pSrcModel, size_t uiField,
                                                   wxVirtualIStateModel *pStateModel)
 {
-    if (m_pComboBox) m_pComboBox->InitFilter(pSrcModel, uiField, pStateModel);
+    if (  ((m_bInitFilterOnDropDown) && (m_bIsDroppingDown))
+        ||(!m_bInitFilterOnDropDown))
+    {
+        if (m_pComboBox) m_pComboBox->InitFilter(pSrcModel, uiField, pStateModel);
+        m_bIsDroppingDown = false;
+    }
 }
 
 /** Check if the filter is currently filtering something
@@ -238,6 +245,7 @@ void wxVirtualDataViewStdFilterEditor::OnFilterChanged(wxCommandEvent &rEvent)
   */
 void wxVirtualDataViewStdFilterEditor::OnFilterInit(wxCommandEvent &rEvent)
 {
+    m_bIsDroppingDown = true;
     NotifyFilterBegin();
     rEvent.Skip();
 }

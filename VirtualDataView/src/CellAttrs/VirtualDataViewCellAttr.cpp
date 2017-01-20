@@ -50,7 +50,11 @@ wxVirtualDataViewCellAttr::wxVirtualDataViewCellAttr(wxString sType,
       m_pEditor(pEditor),
       m_pFilterEditor(pFilterEditor),
       m_pAttr(pAttr),
-      m_iFlags(WX_CELL_READ_ONLY)
+      m_iFlags(WX_CELL_READ_ONLY),
+      m_bOwnRenderer(true),
+      m_bOwnEditor(true),
+      m_bOwnFilterEditor(true),
+      m_bOwnAttributes(true)
 {
 }
 
@@ -62,7 +66,11 @@ wxVirtualDataViewCellAttr::wxVirtualDataViewCellAttr(const wxVirtualDataViewCell
       m_pEditor(WX_VDV_NULL_PTR),
       m_pFilterEditor(WX_VDV_NULL_PTR),
       m_pAttr(WX_VDV_NULL_PTR),
-      m_iFlags(WX_CELL_READ_ONLY)
+      m_iFlags(WX_CELL_READ_ONLY),
+      m_bOwnRenderer(true),
+      m_bOwnEditor(true),
+      m_bOwnFilterEditor(true),
+      m_bOwnAttributes(true)
 {
     Copy(rhs);
 }
@@ -93,53 +101,23 @@ void wxVirtualDataViewCellAttr::Copy(const wxVirtualDataViewCellAttr &rhs)
     m_sType = rhs.m_sType;
     m_iFlags = rhs.m_iFlags;
 
-    if (rhs.m_pRenderer) m_pRenderer = rhs.m_pRenderer->Clone();
-    else                 m_pRenderer = WX_VDV_NULL_PTR;
-
-    if (rhs.m_pEditor)   m_pEditor   = rhs.m_pEditor->Clone();
-    else                 m_pEditor   = WX_VDV_NULL_PTR;
-
-    if (rhs.m_pFilterEditor)    m_pFilterEditor   = rhs.m_pFilterEditor->Clone();
-    else                        m_pFilterEditor   = WX_VDV_NULL_PTR;
-
-    if (rhs.m_pAttr)     m_pAttr     = new wxVirtualDataViewItemAttr(*rhs.m_pAttr);
-    else                 m_pAttr     = WX_VDV_NULL_PTR;
+    CopyRenderer(rhs);
+    CopyEditor(rhs);
+    CopyFilterEditor(rhs);
+    CopyGraphicAttributes(rhs);
 }
 
 /** Release the object
   */
 void wxVirtualDataViewCellAttr::Release(void)
 {
-    if (m_pRenderer) delete(m_pRenderer);
-    m_pRenderer = WX_VDV_NULL_PTR;
-
-    if (m_pEditor) delete(m_pEditor);
-    m_pEditor = WX_VDV_NULL_PTR;
-
-    if (m_pFilterEditor) delete(m_pFilterEditor);
-    m_pFilterEditor = WX_VDV_NULL_PTR;
-
-    if (m_pAttr) delete(m_pAttr);
-    m_pAttr = WX_VDV_NULL_PTR;
+    ReleaseRenderer();
+    ReleaseEditor();
+    ReleaseFilterEditor();
+    ReleaseGraphicAttributes();
 }
 
-//------------------------------- SETTERS ---------------------------//
-/** Set the type
-  * \param sType [input] : the new type
-  */
-void wxVirtualDataViewCellAttr::SetType(wxString sType)
-{
-    m_sType = sType;
-}
-
-/** Set cell flags
-  * \param iFlags [input]: the new cell flags. Combination of ECellType
-  */
-void wxVirtualDataViewCellAttr::SetCellFlags(int iFlags)
-{
-    m_iFlags = iFlags;
-}
-
+//-------------------- RENDERER -------------------------------------//
 /** Set the renderer
   * \param pRenderer [input]: the new renderer
   *                           Ownership is taken
@@ -150,10 +128,61 @@ void wxVirtualDataViewCellAttr::SetCellFlags(int iFlags)
 void wxVirtualDataViewCellAttr::SetRenderer(wxVirtualDataViewRenderer *pRenderer)
 {
     if (pRenderer == m_pRenderer) return;
-    if (m_pRenderer) delete(m_pRenderer);
+    ReleaseRenderer();
     m_pRenderer = pRenderer;
 }
 
+/** Release the renderer
+  */
+void wxVirtualDataViewCellAttr::ReleaseRenderer(void)
+{
+    if ((m_pRenderer) && (m_bOwnRenderer)) delete(m_pRenderer);
+    m_pRenderer = WX_VDV_NULL_PTR;
+}
+
+/** Copy the renderer
+  * \param rhs [input]: the object to copy
+  */
+void wxVirtualDataViewCellAttr::CopyRenderer(const wxVirtualDataViewCellAttr &rhs)
+{
+    if (!rhs.m_bOwnRenderer)
+    {
+        m_pRenderer = rhs.m_pRenderer;
+        m_bOwnRenderer = false;
+        return;
+    }
+
+    if (rhs.m_pRenderer) m_pRenderer = rhs.m_pRenderer->Clone();
+    else                 m_pRenderer = WX_VDV_NULL_PTR;
+    m_bOwnRenderer = true;
+}
+
+/** Check if the renderer is owned by the object
+  * \return true if the renderer is owned by this object, false otherwise
+  * If it is owned, the destructor will call "delete" on the renderer
+  */
+bool wxVirtualDataViewCellAttr::IsOwnRenderer(void) const
+{
+    return(m_bOwnRenderer);
+}
+
+/** Take ownership of the renderer
+  * The destructor will call "delete" on the renderer
+  */
+void wxVirtualDataViewCellAttr::TakeRendererOwnership(void)
+{
+    m_bOwnRenderer = true;
+}
+
+/** Release ownership of the renderer
+  * The destructor will do nothing with the renderer
+  */
+void wxVirtualDataViewCellAttr::ReleaseRendererOwnership(void)
+{
+    m_bOwnRenderer = false;
+}
+
+//-------------------- EDITOR ---------------------------------------//
 /** Set the editor
   * \param pEditor [input]: the new editor
   *                         Ownership is taken
@@ -164,10 +193,61 @@ void wxVirtualDataViewCellAttr::SetRenderer(wxVirtualDataViewRenderer *pRenderer
 void wxVirtualDataViewCellAttr::SetEditor(wxVirtualDataViewEditor *pEditor)
 {
     if (pEditor == m_pEditor) return;
-    if (m_pEditor) delete(m_pEditor);
+    ReleaseEditor();
     m_pEditor = pEditor;
 }
 
+/** Release the editor
+  */
+void wxVirtualDataViewCellAttr::ReleaseEditor(void)
+{
+    if ((m_pEditor) && (m_bOwnEditor)) delete(m_pEditor);
+    m_pEditor = WX_VDV_NULL_PTR;
+}
+
+/** Copy the editor
+  * \param rhs [input]: the object to copy
+  */
+void wxVirtualDataViewCellAttr::CopyEditor(const wxVirtualDataViewCellAttr &rhs)
+{
+    if (!rhs.m_bOwnEditor)
+    {
+        m_pEditor = rhs.m_pEditor;
+        m_bOwnEditor = false;
+        return;
+    }
+
+    if (rhs.m_pEditor) m_pEditor = rhs.m_pEditor->Clone();
+    else               m_pEditor = WX_VDV_NULL_PTR;
+    m_bOwnEditor = true;
+}
+
+/** Check if the editor is owned by the object
+  * \return true if the editor is owned by this object, false otherwise
+  * If it is owned, the destructor will call "delete" on the editor
+  */
+bool wxVirtualDataViewCellAttr::IsOwnEditor(void) const
+{
+    return(m_bOwnEditor);
+}
+
+/** Take ownership of the editor
+  * The destructor will call "delete" on the editor
+  */
+void wxVirtualDataViewCellAttr::TakeEditorOwnership(void)
+{
+    m_bOwnEditor = true;
+}
+
+/** Release ownership of the editor
+  * The destructor will do nothing with the editor
+  */
+void wxVirtualDataViewCellAttr::ReleaseEditorOwnership(void)
+{
+    m_bOwnEditor = false;
+}
+
+//--------------------- FILTER EDITOR -------------------------------//
 /** Set the filter editor
   * \param pFilterEditor [input]: the new filter
   *                               Ownership is taken
@@ -178,10 +258,61 @@ void wxVirtualDataViewCellAttr::SetEditor(wxVirtualDataViewEditor *pEditor)
 void wxVirtualDataViewCellAttr::SetFilterEditor(wxVirtualDataViewIFilterEditor *pFilterEditor)
 {
     if (pFilterEditor == m_pFilterEditor) return;
-    if (m_pFilterEditor) delete(m_pFilterEditor);
+    ReleaseFilterEditor();
     m_pFilterEditor = pFilterEditor;
 }
 
+/** Release the filter editor
+  */
+void wxVirtualDataViewCellAttr::ReleaseFilterEditor(void)
+{
+    if ((m_pFilterEditor) && (m_bOwnFilterEditor)) delete(m_pFilterEditor);
+    m_pFilterEditor = WX_VDV_NULL_PTR;
+}
+
+/** Copy the filter editor
+  * \param rhs [input]: the object to copy
+  */
+void wxVirtualDataViewCellAttr::CopyFilterEditor(const wxVirtualDataViewCellAttr &rhs)
+{
+    if (!rhs.m_bOwnFilterEditor)
+    {
+        m_pFilterEditor = rhs.m_pFilterEditor;
+        m_bOwnFilterEditor = false;
+        return;
+    }
+
+    if (rhs.m_pFilterEditor) m_pFilterEditor = rhs.m_pFilterEditor->Clone();
+    else                     m_pFilterEditor = WX_VDV_NULL_PTR;
+    m_bOwnFilterEditor = true;
+}
+
+/** Check if the filter editor is owned by the object
+  * \return true if the filter editor is owned by this object, false otherwise
+  * If it is owned, the destructor will call "delete" on the filter editor
+  */
+bool wxVirtualDataViewCellAttr::IsOwnFilterEditor(void) const
+{
+    return(m_bOwnFilterEditor);
+}
+
+/** Take ownership of the filter editor
+  * The destructor will call "delete" on the filter editor
+  */
+void wxVirtualDataViewCellAttr::TakeFilterEditorOwnership(void)
+{
+    m_bOwnFilterEditor = true;
+}
+
+/** Release ownership of the filter editor
+  * The destructor will do nothing with the filter editor
+  */
+void wxVirtualDataViewCellAttr::ReleaseFilterEditorOwnership(void)
+{
+    m_bOwnFilterEditor = false;
+}
+
+//-------------------- GRAPHIC ATTRIBUTES ---------------------------//
 /** Set the graphic attributes
   * \param pAttr [input]: the new graphic attributes
   *                       Ownership is taken
@@ -192,8 +323,67 @@ void wxVirtualDataViewCellAttr::SetFilterEditor(wxVirtualDataViewIFilterEditor *
 void wxVirtualDataViewCellAttr::SetGraphicAttributes(wxVirtualDataViewItemAttr *pAttr)
 {
     if (pAttr == m_pAttr) return;
-    if (m_pAttr) delete(m_pAttr);
+    ReleaseGraphicAttributes();
     m_pAttr = pAttr;
+}
+
+/** Release the graphic attributes
+  */
+void wxVirtualDataViewCellAttr::ReleaseGraphicAttributes(void)
+{
+    if ((m_pAttr) && (m_bOwnAttributes)) delete(m_pAttr);
+    m_pAttr = WX_VDV_NULL_PTR;
+}
+
+/** Copy the graphic attributes
+  * \param rhs [input]: the object to copy
+  */
+void wxVirtualDataViewCellAttr::CopyGraphicAttributes(const wxVirtualDataViewCellAttr &rhs)
+{
+    if (!rhs.m_bOwnAttributes)
+    {
+        m_pAttr = rhs.m_pAttr;
+        m_bOwnAttributes = false;
+        return;
+    }
+
+    if (rhs.m_pAttr) m_pAttr = new wxVirtualDataViewItemAttr(*rhs.m_pAttr);
+    else             m_pAttr = WX_VDV_NULL_PTR;
+    m_bOwnAttributes = true;
+}
+
+/** Check if the graphic attributes is owned by the object
+  * \return true if the graphic attributes is owned by this object, false otherwise
+  * If it is owned, the destructor will call "delete" on the graphic attributes
+  */
+bool wxVirtualDataViewCellAttr::IsOwnGraphicAttributes(void) const
+{
+    return(m_bOwnAttributes);
+}
+
+/** Take ownership of the graphic attributes
+  * The destructor will call "delete" on the graphic attributes
+  */
+void wxVirtualDataViewCellAttr::TakeGraphicAttributesOwnership(void)
+{
+    m_bOwnAttributes = true;
+}
+
+/** Release ownership of the graphic attributes
+  * The destructor will do nothing with the graphic attributes
+  */
+void wxVirtualDataViewCellAttr::ReleaseGraphicAttributesOwnership(void)
+{
+    m_bOwnAttributes = false;
+}
+
+//------------------------------- FLAGS -----------------------------//
+/** Set cell flags
+  * \param iFlags [input]: the new cell flags. Combination of ECellType
+  */
+void wxVirtualDataViewCellAttr::SetCellFlags(int iFlags)
+{
+    m_iFlags = iFlags;
 }
 
 /** Set read-only / editable
@@ -226,7 +416,15 @@ void wxVirtualDataViewCellAttr::SetActivatable(bool bActivatable)
     else              m_iFlags &= ~(WX_CELL_ACTIVATABLE);
 }
 
-//--------------------- DEFAULT TYPES -------------------------------//
+//--------------------- TYPES ---------------------------------------//
+/** Set the type
+  * \param sType [input] : the new type
+  */
+void wxVirtualDataViewCellAttr::SetType(wxString sType)
+{
+    m_sType = sType;
+}
+
 /** Set the attributes from the type
   * \return true if the type could be recognized
   *         false otherwise

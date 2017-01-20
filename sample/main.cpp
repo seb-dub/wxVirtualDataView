@@ -16,7 +16,9 @@
 
 #include <wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttr.h>
 #include <wx/VirtualDataView/CellAttrs/VirtualDataViewCellAttrProvider.h>
+#include <wx/VirtualDataView/Renderers/VirtualDataViewTextRenderer.h>
 #include <wx/VirtualDataView/Editors/VirtualDataViewChoiceEditor.h>
+#include <wx/VirtualDataView/Editors/VirtualDataViewNumberEditor.h>
 
 
 
@@ -378,32 +380,67 @@ wxWindow* MyFrame::CreateDataViewTree(wxWindow *pParent)
 
     //add columns
     wxVirtualDataViewColumn oCol1("title", 0);
-    oCol1.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    oCol1.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_BITMAPTEXT);
     oCol1.SetFromType();
     oCol1.SetWidth(200);
-    oCol1.SetMinWidth(50);
+    oCol1.SetMinWidth(150);
     oCol1.SetEditable();
     pTree->Columns().AppendColumn(oCol1);
 
-    wxVirtualDataViewColumn oCol2("artist", 0);
+    wxVirtualDataViewColumn oCol2("artist", 1);
     oCol2.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
     oCol2.SetFromType();
-    oCol2.SetWidth(200);
-    oCol2.SetMinWidth(50);
+    oCol2.SetWidth(150);
+    oCol2.SetMinWidth(150);
     oCol2.SetEditable();
+    wxVirtualDataViewTextRenderer *pTextRenderer2 = (wxVirtualDataViewTextRenderer*) oCol2.GetRenderer();
+    pTextRenderer2->SetEllipsizeMode(wxVirtualDataViewRenderer::WX_ELLIPSIZE_MIDDLE);
     pTree->Columns().AppendColumn(oCol2);
 
-    wxVirtualDataViewColumn oCol3("year", 0);
-    oCol3.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    wxVirtualDataViewColumn oCol3("year", 2);
+    oCol3.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_UNSIGNED_INTEGER);
     oCol3.SetFromType();
-    oCol3.SetWidth(200);
-    oCol3.SetMinWidth(50);
+    oCol3.SetWidth(60);
+    oCol3.SetMinWidth(0);
     oCol3.SetEditable();
+    wxVirtualDataViewNumberEditor *pEditor3 = (wxVirtualDataViewNumberEditor *) oCol3.GetEditor();
+    pEditor3->SetRange((long) 0, 2010);
     pTree->Columns().AppendColumn(oCol3);
+
+    wxVirtualDataViewColumn oCol4("rating", 3);
+    oCol4.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_STRING);
+    oCol4.SetFromType();
+    oCol4.SetWidth(100);
+    oCol4.SetMinWidth(0);
+    oCol4.SetEditable();
+    wxVirtualDataViewChoiceEditor *pChoiceEditor = new wxVirtualDataViewChoiceEditor;
+    wxArrayString vChoices;
+    vChoices.push_back("good");
+    vChoices.push_back("bad");
+    vChoices.push_back("loosy");
+    pChoiceEditor->SetReadOnly();
+    pChoiceEditor->SetChoices(vChoices);
+    oCol4.GetAttribute()->SetEditor(pChoiceEditor);
+    pTree->Columns().AppendColumn(oCol4);
+
+    wxVirtualDataViewColumn oCol5("popularity", 4);
+    oCol5.SetType(wxVirtualDataViewColumn::wxVDATAVIEW_COL_PROGRESS);
+    oCol5.SetFromType();
+    oCol5.SetWidth(80);
+    oCol5.SetMinWidth(0);
+    oCol5.SetEditable();
+    pTree->Columns().AppendColumn(oCol5);
 
     //set model
     m_music_model = new MyMusicTreeModel;
     pTree->AssociateModel(m_music_model.get());
+
+    //select nodes
+    wxVirtualItemID idRoot = pTree->GetRootItem();
+    wxVirtualItemID idMusic = pTree->GetChildItem(idRoot, 0);
+    wxVirtualItemID idClassical = pTree->GetChildItem(idMusic, 1);
+    wxVirtualItemID idNinth = pTree->GetChildItem(idClassical, 0);
+    pTree->EnsureItemVisible(idNinth, 0);
 
     return(pTree);
 

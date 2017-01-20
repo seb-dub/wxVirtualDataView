@@ -19,6 +19,7 @@ wxVirtualDataViewColumnsList::wxVirtualDataViewColumnsList(void)
   */
 wxVirtualDataViewColumnsList::~wxVirtualDataViewColumnsList(void)
 {
+    Clear();
 }
 
 //--------------------- DELETE --------------------------------------//
@@ -26,6 +27,14 @@ wxVirtualDataViewColumnsList::~wxVirtualDataViewColumnsList(void)
   */
 void wxVirtualDataViewColumnsList::Clear(void)
 {
+    TArrayOfColumns::iterator it    = m_vColumns.begin();
+    TArrayOfColumns::iterator itEnd = m_vColumns.end();
+    while(it != itEnd)
+    {
+        wxVirtualDataViewColumn *pCol = *it;
+        if (pCol) delete(pCol);
+        ++it;
+    }
     m_vColumns.clear();
 }
 
@@ -35,8 +44,12 @@ void wxVirtualDataViewColumnsList::Clear(void)
   */
 void wxVirtualDataViewColumnsList::DeleteColumn(size_t uiColumn)
 {
+    if (uiColumn >= m_vColumns.size()) return;
+
     TArrayOfColumns::iterator it = m_vColumns.begin();
     it += uiColumn;
+    wxVirtualDataViewColumn *pCol = *it;
+    if (pCol) delete(pCol);
     m_vColumns.erase(it);
 }
 
@@ -51,6 +64,15 @@ void wxVirtualDataViewColumnsList::DeleteColumns(size_t uiFirst, size_t uiCount)
 
     TArrayOfColumns::iterator itLast = itFirst + uiCount;
 
+    TArrayOfColumns::iterator it    = itFirst;
+    TArrayOfColumns::iterator itEnd = m_vColumns.end();
+    while ((it < itLast) && (it != itEnd))
+    {
+        wxVirtualDataViewColumn *pCol = *it;
+        if (pCol) delete(pCol);
+        ++it;
+    }
+
     m_vColumns.erase(itFirst, itLast);
 }
 
@@ -60,7 +82,7 @@ void wxVirtualDataViewColumnsList::DeleteColumns(size_t uiFirst, size_t uiCount)
   */
 void wxVirtualDataViewColumnsList::AppendColumn(const wxVirtualDataViewColumn &rCol)
 {
-    m_vColumns.push_back(rCol);
+    m_vColumns.push_back(new wxVirtualDataViewColumn(rCol));
 }
 
 /** Insert a column
@@ -71,7 +93,7 @@ void wxVirtualDataViewColumnsList::InsertColumn(size_t uiBefore,
                                                 const wxVirtualDataViewColumn &rCol)
 {
     TArrayOfColumns::iterator it = m_vColumns.begin() + uiBefore;
-    m_vColumns.insert(it, rCol);
+    m_vColumns.insert(it, new wxVirtualDataViewColumn(rCol));
 }
 
 //---------------------- GET ----------------------------------------//
@@ -92,7 +114,7 @@ size_t wxVirtualDataViewColumnsList::GetColumnsCount(void) const
 wxVirtualDataViewColumn* wxVirtualDataViewColumnsList::GetColumn(size_t uiColumn) const
 {
     if (uiColumn >= m_vColumns.size()) return(WX_VDV_NULL_PTR);
-    return(const_cast<wxVirtualDataViewColumn*>(&m_vColumns[uiColumn]));
+    return(const_cast<wxVirtualDataViewColumn*>(m_vColumns[uiColumn]));
 }
 
 //----------------------- REORDER -----------------------------------//
@@ -109,7 +131,7 @@ void wxVirtualDataViewColumnsList::SwapColumns(size_t uiCol1, size_t uiCol2)
     if (uiCol2 >= m_vColumns.size()) return;
 
     //swap
-    wxVirtualDataViewColumn cSwap = m_vColumns[uiCol1];
+    wxVirtualDataViewColumn *cSwap = m_vColumns[uiCol1];
     m_vColumns[uiCol1] = m_vColumns[uiCol2];
     m_vColumns[uiCol2] = cSwap;
 }
@@ -133,6 +155,7 @@ void wxVirtualDataViewColumnsList::ReorderColumns(size_t *pNewOrder)
     //create new vector
     size_t uiMax = m_vColumns.size();
     TArrayOfColumns vTemp;
+    vTemp.clear();
     vTemp.reserve(uiMax);
 
     //reorder
@@ -163,6 +186,7 @@ void wxVirtualDataViewColumnsList::MoveColumn(size_t uiCol, size_t uiMoveAt)
 
     //create new vector
     TArrayOfColumns vTemp;
+    vTemp.clear();
     vTemp.reserve(uiMax);
 
     //reorder
@@ -194,8 +218,9 @@ size_t wxVirtualDataViewColumnsList::GetColumnIndex(size_t uiModelField)
     size_t i;
     for(i=0;i<uiMax;i++)
     {
-        wxVirtualDataViewColumn &rCol = m_vColumns[i];
-        if (rCol.GetModelColumn() == uiModelField) return(i);
+        wxVirtualDataViewColumn *pCol = m_vColumns[i];
+        if (!pCol) continue;
+        if (pCol->GetModelColumn() == uiModelField) return(i);
     }
 
     return(size_t(-1));
@@ -214,8 +239,9 @@ int wxVirtualDataViewColumnsList::GetColumnStart(size_t uiCol) const
     int iOffset = 0;
     for(i=0;i<uiCol;i++)
     {
-        const wxVirtualDataViewColumn &rCol = m_vColumns[i];
-        iOffset += rCol.GetWidth();
+        const wxVirtualDataViewColumn *pCol = m_vColumns[i];
+        if (!pCol) continue;
+        iOffset += pCol->GetWidth();
     }
     return(iOffset);
 }
@@ -228,8 +254,9 @@ int wxVirtualDataViewColumnsList::GetColumnStart(size_t uiCol) const
 int wxVirtualDataViewColumnsList::GetColumnWidth(size_t uiCol) const
 {
     if (uiCol >= m_vColumns.size()) return(-1);
-    const wxVirtualDataViewColumn &rCol = m_vColumns[uiCol];
-    return(rCol.GetWidth());
+    const wxVirtualDataViewColumn *pCol = m_vColumns[uiCol];
+    if (!pCol) return(0);
+    return(pCol->GetWidth());
 }
 
 /** Get the total width of the columns
@@ -242,8 +269,9 @@ int wxVirtualDataViewColumnsList::GetTotalWidth(void) const
     int iWidth = 0;
     for(uiCol = 0; uiCol < uiNbCols; uiCol++)
     {
-        const wxVirtualDataViewColumn &rCol = m_vColumns[uiCol];
-        iWidth += rCol.GetWidth();
+        const wxVirtualDataViewColumn *pCol = m_vColumns[uiCol];
+        if (!pCol) continue;
+        iWidth += pCol->GetWidth();
     }
     return(iWidth);
 }

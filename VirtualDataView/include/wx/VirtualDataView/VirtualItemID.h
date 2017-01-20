@@ -671,7 +671,7 @@ WX_VDV_INLINE bool wxVirtualItemID::HasChildIndex(void) const
   */
 WX_VDV_INLINE bool wxVirtualItemID::IsSame(const wxVirtualItemID &rhs) const
 {
-//    if (m_pModel != rhs.m_pModel) return(false);
+    //reminder : do not take into account m_pModel and m_uiChildIndex
 
     const TStandardID &rLeftID  = m_Data.m_StandardID;
     const TStandardID &rRightID = rhs.m_Data.m_StandardID;
@@ -687,8 +687,7 @@ WX_VDV_INLINE bool wxVirtualItemID::IsSame(const wxVirtualItemID &rhs) const
   */
 WX_VDV_INLINE bool wxVirtualItemID::IsLess(const wxVirtualItemID &rhs) const
 {
-//    if (m_pModel < rhs.m_pModel) return(true);
-//    if (m_pModel > rhs.m_pModel) return(false);
+    //reminder : do not take into account m_pModel and m_uiChildIndex
 
     const TStandardID &rLeftID  = m_Data.m_StandardID;
     const TStandardID &rRightID = rhs.m_Data.m_StandardID;
@@ -715,6 +714,7 @@ WX_VDV_INLINE bool wxVirtualItemID::operator==(const wxVirtualItemID &rhs) const
 /** Operator != **/
 WX_VDV_INLINE bool wxVirtualItemID::operator!=(const wxVirtualItemID &rhs) const
 {
+    //reminder : do not take into account m_pModel and m_uiChildIndex
     //if (m_pModel != rhs.m_pModel) return(true);
 
     const TStandardID &rLeftID  = m_Data.m_StandardID;
@@ -781,6 +781,8 @@ WX_VDV_INLINE unsigned long wxComputeHashSizeT(size_t uiValue, unsigned long uiC
   */
 WX_VDV_INLINE unsigned long wxVirtualItemID::GetHashCode(void) const
 {
+    //reminder : do not take into account m_pModel and m_uiChildIndex
+
     //NOK: too many collisions
 //    unsigned long ulResult = 0;
 //
@@ -788,7 +790,6 @@ WX_VDV_INLINE unsigned long wxVirtualItemID::GetHashCode(void) const
 //    ulResult = reinterpret_cast<size_t>(rID.m_ID.m_pData);
 //    ulResult ^= (rID.m_uiRow << 16);
 //    ulResult ^= (rID.m_uiCol << 16);
-//    //ulResult ^= reinterpret_cast<size_t>(m_pModel);
 
     //OK (murmurhash3 avalanche trigger)
 //    unsigned long ulResult = 0;
@@ -797,14 +798,12 @@ WX_VDV_INLINE unsigned long wxVirtualItemID::GetHashCode(void) const
 //    ulResult = reinterpret_cast<size_t>(rID.m_ID.m_pData);
 //    ulResult = ulResult * 101 + rID.m_uiRow;
 //    ulResult = ulResult * 101 + rID.m_uiCol;
-//    ulResult = ulResult * 101 + m_uiChildIndex;
 
     unsigned long ulResult = s_uiFNVOffsetBasis;
     const TStandardID &rID = m_Data.m_StandardID;
     ulResult = wxComputeHashSizeT(reinterpret_cast<size_t>(rID.m_ID.m_pData), ulResult);
     ulResult = wxComputeHashSizeT(rID.m_uiRow, ulResult);
     ulResult = wxComputeHashSizeT(rID.m_uiCol, ulResult);
-    ulResult = wxComputeHashSizeT(m_uiChildIndex, ulResult);
 
     return(ulResult);
 }

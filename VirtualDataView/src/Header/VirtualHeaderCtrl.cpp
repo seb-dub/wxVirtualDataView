@@ -568,8 +568,37 @@ void wxVirtualHeaderCtrl::PaintHeader(wxDC &rDC, wxRect &rRect, size_t uiViewCoo
     //get header data from model (may override some values - by design)
     GetItemData(uiViewCoord, rData);
 
+    //filter
+    wxRect r = rRect;
+    wxRect rFilter;
+    wxVirtualDataViewIFilterEditor *pFilterEditor = WX_VDV_NULL_PTR;
+    if (m_bShowFilters)
+    {
+        pFilterEditor = GetFilterEditor(uiViewCoord);
+        if (pFilterEditor)
+        {
+            wxSize sItem = GetItemSize(uiViewCoord);
+            wxSize sFilterSizer = pFilterEditor->GetSize(this);
+            if (m_eOrientation == WX_VDV_COL_HEADER)
+            {
+                rFilter = wxRect(0, sItem.GetHeight(), sItem.GetWidth(), sFilterSizer.GetHeight());
+                r.SetHeight(sItem.GetHeight());
+            }
+            else
+            {
+                rFilter = wxRect(sItem.GetWidth(), 0, sFilterSizer.GetWidth(), sItem.GetHeight());
+                r.SetWidth(sItem.GetWidth());
+            }
+        }
+    }
+
     //draw
-    m_pRenderer->DrawHeader(rDC, rRect, (const wxVirtualHeaderIRenderer::THeaderData&) rData);
+    m_pRenderer->DrawHeader(rDC, r, (const wxVirtualHeaderIRenderer::THeaderData&) rData);
+    if ((m_bShowFilters) && (pFilterEditor))
+    {
+        PaintBackground(rDC, rFilter);
+        pFilterEditor->Draw(this, rDC, rFilter);
+    }
 }
 
 /** Only paint background

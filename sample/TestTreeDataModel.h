@@ -9,26 +9,31 @@ class TestTreeDataModel : public wxVirtualIDataModel
     public:
 
         //constructors & destructor
-        TestTreeDataModel(bool bEmpty = false);                                     ///< \brief default constructor
-        virtual ~TestTreeDataModel(void);                                           ///< \brief destructor
+        TestTreeDataModel(bool bEmpty = false);                                             ///< \brief default constructor
+        virtual ~TestTreeDataModel(void);                                                   ///< \brief destructor
 
         //interface
-        virtual wxVirtualItemID GetParent(const wxVirtualItemID &rID = s_RootID);   ///< \brief get the parent item ID
-        virtual size_t          GetChildCount(const wxVirtualItemID &rID);          ///< \brief get the amount of children
+        virtual wxVirtualItemID GetParent(const wxVirtualItemID &rID = s_RootID);           ///< \brief get the parent item ID
+        virtual size_t          GetChildCount(const wxVirtualItemID &rID);                  ///< \brief get the amount of children
         virtual wxVirtualItemID GetChild(const wxVirtualItemID &rIDParent,
-                                         size_t uiChildIndex);                      ///< \brief get child item ID
-        virtual size_t          GetFieldCount(const wxVirtualItemID &rID);          ///< \brief get the amount of fields in the item
+                                         size_t uiChildIndex);                              ///< \brief get child item ID
+        virtual size_t          GetFieldCount(const wxVirtualItemID &rID);                  ///< \brief get the amount of fields in the item
 
         virtual wxVariant GetItemData(const wxVirtualItemID &rID,
                                       size_t uiField = 0,
-                                      EDataType eType = WX_ITEM_MAIN_DATA);         ///< \brief get the item data
+                                      EDataType eType = WX_ITEM_MAIN_DATA);                 ///< \brief get the item data
         virtual bool      SetItemData(const wxVirtualItemID &rID, size_t uiField,
                                       const wxVariant &vValue,
-                                      EDataType eType = WX_ITEM_MAIN_DATA);         ///< \brief set the item data
+                                      EDataType eType = WX_ITEM_MAIN_DATA);                 ///< \brief set the item data
         virtual wxVirtualDataViewItemAttr* GetItemAttribute(const wxVirtualItemID &rID,
                                                             size_t uiField,
                                               const wxVirtualDataViewItemState &rState);    ///< \brief get the item graphic attributes
 
+        //filtering - get all values as strings & variants
+        virtual void GetAllValues(wxArrayString &rvStrings, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of strings
+        virtual void GetAllValues(wxVector<wxVariant> &rvVariants, size_t uiField,
+                                  wxVirtualIStateModel *pStateModel);                       ///< \brief get all the values inside an array of variants
     private:
         //structs
         struct TID
