@@ -37,6 +37,7 @@ class WXDLLIMPEXP_VDV wxVirtualIArrayProxyDataModel : public wxVirtualIProxyData
         virtual ~wxVirtualIArrayProxyDataModel(void);                                       ///< \brief destructor
 
         //interface : hierarchy
+        virtual wxVirtualItemID GetParent(const wxVirtualItemID &rID = s_RootID);           ///< \brief get the parent of the item
         virtual size_t          GetChildCount(const wxVirtualItemID &rID);                  ///< \brief get the amount of children
         virtual wxVirtualItemID GetChild(const wxVirtualItemID &rIDParent,
                                          size_t uiChildIndex);                              ///< \brief get child item ID
@@ -91,12 +92,14 @@ class WXDLLIMPEXP_VDV wxVirtualIArrayProxyDataModel : public wxVirtualIProxyData
     protected:
         //typedef
         typedef LRUCache<wxVirtualItemID, wxVirtualItemIDs> TCachedResults;
+        typedef LRUCache<wxVirtualItemID, size_t> TCachedChildrenIndices;
 
         //data
-        wxVirtualItemIDs    m_vChildren;                                                    ///< \brief temp array
-        TCachedResults      m_CachedResult;                                                 ///< \brief cached results
-        size_t              m_uiMinAmountOfChildrenForCaching;                              ///< \brief minimal amount of children for caching
-        size_t              m_uiMaxAmountOfChildrenForCaching;                              ///< \brief maximal amount of children for caching
+        wxVirtualItemIDs        m_vChildren;                                                ///< \brief temp array
+        TCachedResults          m_CachedResult;                                             ///< \brief cached results
+        size_t                  m_uiMinAmountOfChildrenForCaching;                          ///< \brief minimal amount of children for caching
+        size_t                  m_uiMaxAmountOfChildrenForCaching;                          ///< \brief maximal amount of children for caching
+        TCachedChildrenIndices  m_CachedChildrenIndices;                                    ///< \brief cached children indices
 
         //methods
         const wxVirtualItemIDs& GetAllChildren(const wxVirtualItemID &rIDParent);           ///< \brief get all children

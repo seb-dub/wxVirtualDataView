@@ -11,7 +11,25 @@
 #define _lru_cache_using_std_
 
 #include <list>
-#include <map>
+
+#define USE_BOOST_HASH_MAP      0
+#if USE_BOOST_HASH_MAP != 0
+    #include <boost/unordered_map.hpp>
+
+    inline std::size_t hash_value(const wxVirtualItemID &rID)
+    {
+        return(rID.GetHashCode());
+    }
+
+    #define TMAP                 boost::unordered_map
+
+#else
+    #include <map>
+
+    #define TMAP                std::map
+#endif
+
+
 
 /** \class LRUCache : provides a Least-Recently-Used (LRU) replacement cache
   * The cache has a fixed size.
@@ -50,7 +68,8 @@ class LRUCache
         typedef std::list<TKey> TKeyTracker;                        ///< \brief Key access history, most recent at back
         typedef typename TKeyTracker::iterator TKeyIterator;        ///< \brief key tracker iterator
         typedef std::pair<TValue, TKeyIterator> TValueKeyIterator;  ///< \brief (value, key tracker iterator) pair
-        typedef std::map<TKey,TValueKeyIterator> TKeyToValue;       ///< \brief Key to value and key history iterator
+        typedef TMAP<TKey,TValueKeyIterator> TKeyToValue;           ///< \brief Key to value and key history iterator
+        //typedef boost::unordered_map<TKey, TValueKeyIterator> TKeyToValue;
 
         //data
         size_t          m_uiCapacity;                               ///< \brief Maximum number of key-value pairs to be retained

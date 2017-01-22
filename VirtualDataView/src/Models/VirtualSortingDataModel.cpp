@@ -17,7 +17,7 @@ wxVirtualSortingDataModel::wxVirtualSortingDataModel(void)
       m_bFastSorting(true)
 {
     SetMinAmountOfChildrenForCaching(5);
-    SetCacheSize(1000000);
+    SetCacheSize(10000);
 }
 
 /** Destructor
@@ -27,19 +27,6 @@ wxVirtualSortingDataModel::~wxVirtualSortingDataModel(void)
 }
 
 //-------------------- INTERFACE : HIERARCHY ------------------------//
-/** Get the parent of the item
-  * \param rID [input]: the child item
-  */
-wxVirtualItemID wxVirtualSortingDataModel::GetParent(const wxVirtualItemID &rID)
-{
-    //reimplememted to ensure that the child index is correct
-    if (!m_pDataModel) return(CreateInvalidItemID());
-    wxVirtualItemID idParent = m_pDataModel->GetParent(rID);
-    idParent.ResetChildIndex();
-    idParent.SetChildIndex(GetChildIndex(idParent));
-    return(idParent);
-}
-
 /** Get amount of children
   * \param rID [input]: the ID of the item to query
   * \return the amount of children to rID
@@ -50,6 +37,30 @@ size_t wxVirtualSortingDataModel::GetChildCount(const wxVirtualItemID &rIDParent
     //so bypass the proxy mechanism
     if (m_pDataModel) return(m_pDataModel->GetChildCount(rIDParent));
     return(0);
+}
+
+//---------------- INTERFACE : COMMON METHODS -----------------------//
+/** Compute the size of a sub-tree.
+  * Used by FindItem (bottleneck of the FindItem method) -> this need to be efficient for
+  *                                                         implementing fast scrolling on huge trees
+  * \param rID [input]: the root node of sub-tree
+  * \param pStateModel [input]: the state model.
+  *                             If NULL, all sub-nodes are counted
+  *                             If non-NULL, sub-nodes which are collapsed are counted as 1
+  * \return the amount of nodes in the sub-tree, including the root node
+  *         So it is always >= 1
+  *
+  * Default implementation use a wxStack internally
+  * O(n) time, O(n) space (worst cases, generally O(log(n)) time and space)
+  *
+  * Used by FindItem when start item is the root item
+  */
+size_t wxVirtualSortingDataModel::GetSubTreeSize(const wxVirtualItemID &rID,
+                                           wxVirtualIStateModel *pStateModel)
+{
+    //the sub tree size will not be affected by sorting, so simply forward
+    //to the potentially optimized model
+    return(m_pDataModel->GetSubTreeSize(rID, pStateModel));
 }
 
 //------------ INTEFACE: SORTING ------------------------------------//
@@ -439,6 +450,7 @@ void wxVirtualSortingDataModel::FastSort(wxVirtualItemIDs &vIDs)
 
     //output the results
     vIDs.clear();
+    vIDs.reserve(uiSize);
     for(i=0;i<uiSize;i++)
     {
         vVariants[i].m_id.SetChildIndex(i);

@@ -1769,7 +1769,8 @@ void wxVirtualTreeModelRenderer::OnDataModelChanged(void)
   */
 void wxVirtualTreeModelRenderer::OnLayoutChanged(void)
 {
-    InvalidateFirstVisibleItem();
+    //InvalidateFirstVisibleItem();
+    ComputeFirstVisibleItem(m_iFirstVisibleLine);
     InvalidateCurrentSize();
     InvalidateVirtualSize();
     UpdateScrollbars();
@@ -3327,7 +3328,7 @@ void wxVirtualTreeModelRenderer::Init(void)
     wxColour cColour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT);
     m_bHideRootItem  = true;
     m_TreeLinesPen   = InitTreeLinesPen();
-    m_eTreeLinesStyle = E_TREE_LINES_AT_EXPANDER; //E_TREE_LINES_AT_ITEM E_TREE_LINES_AT_EXPANDER
+    m_eTreeLinesStyle = E_TREE_LINES_AT_EXPANDER; //E_TREE_LINES_AT_ITEM E_TREE_LINES_AT_EXPANDER E_TREE_LINES_NONE
     m_iIndentation    = 15;
     //m_TreeButtonSize  = wxSize(9, 9);
     SetTreeButtonSize(wxSize(-1, -1));

@@ -40,8 +40,11 @@ class WXDLLIMPEXP_VDV wxVirtualSortingDataModel : public wxVirtualIArrayProxyDat
         virtual ~wxVirtualSortingDataModel(void);                                           ///< \brief destructor
 
         //interface : hierarchy
-        virtual wxVirtualItemID GetParent(const wxVirtualItemID &rID = s_RootID);           ///< \brief get the parent of the item
         virtual size_t          GetChildCount(const wxVirtualItemID &rID);                  ///< \brief get the amount of children
+
+        //interface with common implementation
+        virtual size_t          GetSubTreeSize(const wxVirtualItemID &rID,
+                                               wxVirtualIStateModel *pStateModel);          ///< \brief compute the size of a sub-tree
 
         //sorting
         void                ClearSortFilters(void);                                         ///< \brief clear all sorts filter

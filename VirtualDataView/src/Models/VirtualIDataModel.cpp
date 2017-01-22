@@ -431,6 +431,7 @@ size_t wxVirtualIDataModel::GetSubTreeSize(const wxVirtualItemID &rID,
     if (pStateModel)
     {
         //do not recurse on collapse items
+        //DoGetSubTreeSize(uiResult, this, rID, pStateModel);
         while(StackOfNodes.size() > 0)
         {
             wxVirtualItemID id = StackOfNodes.top();
@@ -439,12 +440,20 @@ size_t wxVirtualIDataModel::GetSubTreeSize(const wxVirtualItemID &rID,
             uiResult++;
 
             if (!pStateModel->IsExpanded(id)) continue;
-            lNbChildren = GetChildCount(id);
+
+            wxVirtualItemIDs vChildren;
+            lNbChildren = GetAllChildren(vChildren, id);
             for(lChild = lNbChildren - 1; lChild >= 0; lChild--)
             {
-                wxVirtualItemID idChild = GetChild(id, lChild);
-                StackOfNodes.push(idChild);
+                StackOfNodes.push(vChildren[lChild]);
             }
+
+//            lNbChildren = GetChildCount(id);
+//            for(lChild = lNbChildren - 1; lChild >= 0; lChild--)
+//            {
+//                wxVirtualItemID idChild = GetChild(id, lChild);
+//                StackOfNodes.push(idChild);
+//            }
         }
     }
     else

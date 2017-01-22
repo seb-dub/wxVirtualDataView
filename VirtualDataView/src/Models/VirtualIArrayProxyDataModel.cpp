@@ -16,7 +16,8 @@ wxVirtualIArrayProxyDataModel::wxVirtualIArrayProxyDataModel(void)
     : wxVirtualIProxyDataModel(),
       m_CachedResult(1000),
       m_uiMinAmountOfChildrenForCaching(5),
-      m_uiMaxAmountOfChildrenForCaching(size_t(-1))
+      m_uiMaxAmountOfChildrenForCaching(size_t(-1)),
+      m_CachedChildrenIndices(1000)
 {
 }
 
@@ -33,6 +34,7 @@ void wxVirtualIArrayProxyDataModel::ClearCache(void)
 {
     m_CachedResult.ClearCache();
     m_vChildren.clear();
+    m_CachedChildrenIndices.ClearCache();
 }
 
 /** Set the cache size
@@ -135,6 +137,21 @@ size_t wxVirtualIArrayProxyDataModel::GetChildrenCount(const wxVirtualItemID &rI
 }
 
 //--------------------- INTERFACE: HIERARCHY ------------------------//
+/** Get the parent of the item
+  * \param rID [input]: the child item
+  */
+wxVirtualItemID wxVirtualIArrayProxyDataModel::GetParent(const wxVirtualItemID &rID)
+{
+    //reimplememted to ensure that the child index is correct
+    if (!m_pDataModel) return(CreateInvalidItemID());
+    wxVirtualItemID idParent = m_pDataModel->GetParent(rID);
+
+    //compute child index - this is tricky without a linear search
+    idParent.ResetChildIndex();
+    idParent.SetChildIndex(GetChildIndex(idParent));
+    return(idParent);
+}
+
 /** Get the amount of children
   * \param rID [input]: the ID of the item to query
   * \return the amount of children to rID
@@ -197,7 +214,19 @@ bool wxVirtualIArrayProxyDataModel::HasExpander(const wxVirtualItemID &rID)
   */
 size_t wxVirtualIArrayProxyDataModel::GetChildIndex(const wxVirtualItemID &rChild)
 {
-    return(wxVirtualIDataModel::GetChildIndex(rChild));
+    //see comment in wxVirtualIArrayProxyDataModel::NextItem
+
+    //is it cached ?
+    if (m_CachedChildrenIndices.HasKey(rChild))
+    {
+        //yes: return the cached value
+        return(m_CachedChildrenIndices.GetValue(rChild));
+    }
+
+    //no: compute it, and then cache it
+    size_t uiChildIndex = wxVirtualIDataModel::GetChildIndex(rChild);
+    m_CachedChildrenIndices.Insert(rChild, uiChildIndex);
+    return(uiChildIndex);
 }
 
 /** Get the index of a child. Used by GetNextItem internally
@@ -209,7 +238,19 @@ size_t wxVirtualIArrayProxyDataModel::GetChildIndex(const wxVirtualItemID &rChil
 size_t wxVirtualIArrayProxyDataModel::GetChildIndex(const wxVirtualItemID &rParent,
                                                     const wxVirtualItemID &rChild)
 {
-    return(wxVirtualIDataModel::GetChildIndex(rParent, rChild));
+    //see comment in wxVirtualIArrayProxyDataModel::NextItem
+
+    //is it cached ?
+    if (m_CachedChildrenIndices.HasKey(rChild))
+    {
+        //yes: return the cached value
+        return(m_CachedChildrenIndices.GetValue(rChild));
+    }
+
+    //no: compute it, and then cache it
+    size_t uiChildIndex = wxVirtualIDataModel::GetChildIndex(rParent, rChild);
+    m_CachedChildrenIndices.Insert(rChild, uiChildIndex);
+    return(uiChildIndex);
 }
 
 /** Check if an item is the last child of a parent item
@@ -343,7 +384,78 @@ wxVirtualItemID wxVirtualIArrayProxyDataModel::NextItem(const wxVirtualItemID &r
                                                         wxVirtualIStateModel *pStateModel,
                                                         size_t uiNbItems)
 {
-    return(wxVirtualIDataModel::NextItem(rID, uiLevel, uiNextItemLevel, pStateModel, uiNbItems));
+    //reimplemented because NextItem is performance critical. It is needed for all drawing & scrolling
+    //operations
+    //In the case of a proxy model, the GetParent() followed by GetChildIndex is time consuming
+    //GetParent() is supposed to be O(1), but lose the child index in the general case. The GetChildIndex recovers
+    //it, but is a O(n) operation. So each time the NextItem has reached the last child, it must get the upper level
+    //(GetParent()) and then the next sibling (and we need the child index there). So NextItem becomes a O(n) operation.
+    //And we are calling at each display -> this is a serious slow-down on sorted trees
+    //
+    //The solution consist of caching the last used child index
+
+    bool bIsExpanded = true;
+
+    wxVirtualItemID idParent = GetParent(rID);
+    size_t uiChildIndex = GetChildIndex(idParent, rID);
+    size_t uiChildCount = GetChildCount(idParent);
+
+    size_t i;
+    wxVirtualItemID idCurrent = rID;
+    for(i=0;i<uiNbItems;i++)
+    {
+        //get fist child
+        if (pStateModel) bIsExpanded = pStateModel->IsExpanded(idCurrent);
+
+        if (bIsExpanded)
+        {
+            wxVirtualItemID idChild = GetChild(idCurrent, 0);
+            if ((idChild.IsOK()) && (idChild != idCurrent))
+            {
+                uiNextItemLevel = uiLevel + 1; //GetDepth(idChild);
+                idParent = idCurrent;
+                uiChildIndex = 0;
+                uiChildCount = GetChildCount(idParent);
+                idCurrent = idChild;
+                continue;
+            }
+        }
+
+        //next brother
+        wxVirtualItemID id = idCurrent;
+        uiNextItemLevel = uiLevel;
+        do
+        {
+            //get next sibling
+            if (uiChildIndex + 1 < uiChildCount)
+            {
+                uiChildIndex++;
+                wxVirtualItemID idBrother = GetChild(idParent, uiChildIndex);
+                if (idBrother.IsOK())
+                {
+                    id = idBrother;
+                    idParent = GetParent(id);
+                    uiChildIndex = GetChildIndex(idParent, id);
+                    uiChildCount = GetChildCount(idParent);
+
+                    break;
+                }
+            }
+            id = idParent;
+            if (uiNextItemLevel > 0) uiNextItemLevel--;
+
+            idParent = GetParent(id);
+            uiChildIndex = GetChildIndex(idParent, id);
+            uiChildCount = GetChildCount(idParent);
+        } while (id.IsOK());
+
+        idCurrent = id;
+    }
+    if (idCurrent.IsOK()) return(idCurrent);
+
+    //root
+    uiNextItemLevel = 0;
+    return(CreateInvalidItemID());
 }
 
 /** Find the next item, in depth first order
